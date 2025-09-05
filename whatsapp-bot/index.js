@@ -2,6 +2,8 @@ const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const { GoogleGenAI } = require("@google/genai");
+const config = require('./config');
 
 // Path to the database file
 const dbPath = path.resolve(__dirname, 'whatsapp.db');
@@ -32,8 +34,9 @@ client.on('qr', (qr) => {
     qrcode.generate(qr, { small: true });
 });
 
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log('Client is ready!');
+    summarizeSender("aryan")
 });
 
 client.on('message', async (message) => {
@@ -60,3 +63,35 @@ client.on('message', async (message) => {
 });
 
 client.initialize();
+
+// Google Generative AI Initialization
+const genAI = new GoogleGenAI({apiKey:config.apiKey});
+
+async function summarizeSender(senderName) {
+    console.log(`Fetching and summarizing last 20 messages for: ${senderName}`);
+    db.all(`SELECT sender, message_content FROM messages WHERE sender = ? ORDER BY timestamp DESC LIMIT 20`, [senderName], async (err, rows) => {
+        if (err) {
+            console.error('Error fetching messages from database', err.message);
+            return;
+        }
+
+        if (rows.length === 0) {
+            console.log('No messages found for this chat.');
+            return;
+        }
+
+        const conversation = rows.reverse().map(row => `${row.sender}: ${row.message_content}`).join('\n');
+        
+        try {
+            const prompt = `Summarize the following conversation:\n\n${conversation}`;
+            const result = await genAI.models.generateContent({
+                model : "gemini-1.5-flash",
+                contents : prompt
+            })
+            const summary = result.text;
+            console.log(`\nSummary for ${senderName}:\n`, summary);
+        } catch (error) {
+            console.error('Error generating summary with Google GenAI', error);
+        }
+    });
+}

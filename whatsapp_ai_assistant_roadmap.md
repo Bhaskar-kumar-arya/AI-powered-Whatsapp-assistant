@@ -6,21 +6,18 @@
 
 ### Software
 
-* Python **3.8+** installed on your machine.
-* Node.js **(16+)** installed (for WhatsApp API).
+* Node.js **(16+)** and npm installed.
+* **Electron** for the desktop GUI.
 * VS Code (or another code editor).
 * Git for version control.
-
-### Python Libraries
-
-* `customtkinter`: For the modern-looking GUI.
-* `openai` or `google-generativeai`: To interact with the LLM.
-* `sqlite3` (built-in): For local database storage.
 
 ### Node.js Libraries
 
 * `whatsapp-web.js`: To connect with WhatsApp Web.
 * `qrcode-terminal`: To display QR codes in the terminal.
+* `electron`: The framework for building the desktop app.
+* `openai` or `google-generativeai`: To interact with the LLM.
+* `sqlite3`: For local database storage.
 
 ### Accounts
 
@@ -60,10 +57,9 @@ Define a `messages` table with:
 * `message_content`
 * `timestamp`
 
-### Step 3: Node.js → Python Bridge
+### Step 3: Database Access
 
-* Your Python scripts will read from the SQLite database.
-* No direct communication needed yet.
+* The Electron app will directly read from the SQLite database.
 
 **Milestone:** You can see live WhatsApp messages being saved into `whatsapp.db`.
 
@@ -71,41 +67,41 @@ Define a `messages` table with:
 
 ## Phase 2: The Brain (AI Integration & Logic) 🧠
 
-**Goal:** Connect your Python app to the database and use an LLM for intelligent tasks.
+**Goal:** Connect your Electron app to the database and use an LLM for intelligent tasks.
 
 ### Step 1: API Key Setup
 
 * Get your API key from OpenAI or Google.
-* Install Python dependencies:
+* Install Node.js dependencies in your Electron project:
 
 ```bash
-pip install openai customtkinter
+npm install openai # or google-generativeai
 ```
 
 ### Step 2: Simple AI Task
 
-* Write a Python script to:
+* Write a script within your Electron app to:
 
   * Fetch the last 20 messages from a chosen chat in `whatsapp.db`.
   * Format them into a clean prompt.
   * Ask the LLM to summarize the conversation.
 
-**Milestone:** AI prints summaries of chats from your database.
+**Milestone:** AI prints summaries of chats from your database in the Electron app's console.
 
 ---
 
-## Phase 3: The Control Panel (GUI with CustomTkinter) 🖥️
+## Phase 3: The Control Panel (GUI with Electron) 🖥️
 
-**Goal:** Build a GUI to interact with your assistant.
+**Goal:** Build a GUI to interact with your assistant using Electron.
 
-### Step 1: Static UI
+### Step 1: Static UI with HTML/CSS
 
-Build a CustomTkinter window with:
+Create an `index.html` file for your Electron app with:
 
-* A large text box for logs/output.
-* A dropdown menu to select a chat.
-* A text input field for commands.
-* An **"Execute"** button.
+* A large text area (`<textarea>`) for logs/output.
+* A dropdown (`<select>`) to select a chat.
+* A text input field (`<input type="text">`) for commands.
+* An **"Execute"** button (`<button>`).
 
 ### Step 2: Backend Integration
 
@@ -126,24 +122,24 @@ Build a CustomTkinter window with:
 
 ### Step 1: Define Tools
 
-* Create `tools.py` in Python.
-* Define functions like:
+* Create `tools.js` in your Electron project.
+* Define async functions like:
 
-  * `schedule_message(contact, message, time)`
-  * `calendar_event(title, date, time)`
+  * `scheduleMessage(contact, message, time)`
+  * `createCalendarEvent(title, date, time)`
 
 ### Step 2: Function Calling with AI
 
 * When the LLM responds with a function call:
 
   * Parse the function name + arguments.
-  * Call the corresponding Python function.
+  * Call the corresponding JavaScript function from `tools.js`.
 
 ### Step 3: Scheduler
 
 * Add a `scheduled_messages` table in SQLite.
-* A background Python thread checks due messages.
-* When a message is due → call your Node.js WhatsApp bot to send it.
+* A background process in your Electron app checks for due messages.
+* When a message is due → use an IPC call to the main process to trigger the Node.js WhatsApp bot.
 
 ### Step 4: External Integrations
 
@@ -157,9 +153,9 @@ Build a CustomTkinter window with:
 
 ## ✅ With this setup:
 
-* Node.js (`whatsapp-web.js`) handles WhatsApp connection + database updates.
-* Python handles AI + GUI + scheduling.
-* Both connect through the shared SQLite database.
+* The Node.js listener (`whatsapp-web.js`) handles the WhatsApp connection.
+* The Electron app handles the GUI, AI logic, and scheduling.
+* Both processes communicate via the shared SQLite database.
 
 ---
 
