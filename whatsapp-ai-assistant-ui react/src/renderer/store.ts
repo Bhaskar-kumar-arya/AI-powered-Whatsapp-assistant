@@ -22,18 +22,21 @@ interface AppState {
   chats: Chat[];
   activeChatId: number | null;
   theme: 'light' | 'dark';
+  aiSummary: string | null; // New state for AI summary
   // Actions
   setActiveChat: (id: number) => void;
   markChatAsRead: (id: number) => void;
   updateMessageStatus: (chatId: number, messageId: string, status: 'delivered' | 'read') => void;
   toggleTheme: () => void;
   addMessage: (chatId: number, text: string, sender: 'me' | 'other') => void;
+  setAiSummary: (summary: string | null) => void; // New action to set AI summary
 }
 
 const useStore = create<AppState>((set) => ({
   chats: [], // Initial empty array for chats
   activeChatId: null,
   theme: 'light', // Default theme
+  aiSummary: null, // Initial state for AI summary
 
   setActiveChat: (id: number) => set(() => ({ activeChatId: id })),
   markChatAsRead: (id: number) =>
@@ -79,6 +82,7 @@ const useStore = create<AppState>((set) => ({
           : chat
       ),
     })),
+  setAiSummary: (summary: string | null) => set(() => ({ aiSummary: summary })),
 }));
 
 export default useStore;

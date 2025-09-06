@@ -1,32 +1,17 @@
 import React, { useEffect } from 'react';
 import ChatListItem from './ChatListItem';
-import useStore, { Chat } from '../store';
+import useStore from '../store';
+import { getChats } from '../api';
 
 const Pane1_ChatList: React.FC = () => {
-  const { chats, setActiveChat } = useStore();
+  const { chats, setActiveChat, addMessage } = useStore(); // Add addMessage to destructuring
 
-  // Initialize chats with mock data on component mount
   useEffect(() => {
-    const initializeChats = async () => {
-      const mockData = (await import('../mock-data')).chats;
-      useStore.setState({
-        chats: mockData.map(chat => ({
-          id: chat.id,
-          name: chat.name,
-          avatar: chat.avatar,
-          messages: [{
-            id: `msg-${chat.id}-1`,
-            text: chat.lastMessage,
-            timestamp: chat.timestamp,
-            sender: 'other',
-            status: 'read'
-          }],
-          unreadCount: chat.unread,
-          aiActivity: chat.aiActivity as 'draft' | 'task-pending' | undefined
-        }))
-      });
+    const fetchChats = async () => {
+      const fetchedChats = await getChats();
+      useStore.setState({ chats: fetchedChats });
     };
-    initializeChats();
+    fetchChats();
   }, []);
 
   return (
@@ -41,9 +26,9 @@ const Pane1_ChatList: React.FC = () => {
         </div>
       </div>
       <div className="chat-list-container">
-        {chats.map(chat => (
+        {chats.map((chat) => (
           <div key={chat.id} onClick={() => setActiveChat(chat.id)}>
-            <ChatListItem chat={chat as Chat} />
+            <ChatListItem chat={chat} />
           </div>
         ))}
       </div>

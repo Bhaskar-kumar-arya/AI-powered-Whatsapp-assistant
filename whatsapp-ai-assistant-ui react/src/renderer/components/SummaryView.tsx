@@ -1,14 +1,17 @@
 import React from 'react';
+import useStore from '../store';
 
 const SummaryView: React.FC = () => {
+  const aiSummary = useStore((state) => state.aiSummary);
+
   return (
     <div className="summary-view">
-      <h3>Chat Summaries</h3>
-      <ul>
-        <li>Summary of "Project Team" chat: Discussed Q3 goals and action items.</li>
-        <li>Summary of "Family Group" chat: Planned weekend picnic.</li>
-        <li>Summary of "John Doe" chat: Followed up on meeting notes.</li>
-      </ul>
+      <h3>AI Chat Summary</h3>
+      {aiSummary ? (
+        <p>{aiSummary}</p>
+      ) : (
+        <p>No summary generated yet. Click "Summarize Chat" in the conversation view.</p>
+      )}
     </div>
   );
 };
