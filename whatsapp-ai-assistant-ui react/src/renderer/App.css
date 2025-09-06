@@ -1,0 +1,385 @@
+
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr 350px; /* Adjust widths as needed */
+  height: 100vh;
+  width: 100vw;
+}
+
+.pane1-chatlist {
+  border-right: 1px solid #ccc;
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-list-header {
+  margin-bottom: 10px;
+}
+
+.global-search-bar {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.filter-buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+.filter-button {
+  background-color: #f0f0f0; /* Lighter background */
+  color: #333; /* Darker text for contrast */
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.filter-button:hover {
+  background-color: #e0e0e0; /* Slightly darker on hover */
+}
+
+.chat-list-container {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.chat-list-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.chat-list-item:hover {
+  background-color: #f0f0f0;
+}
+
+.chat-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.chat-info {
+  flex-grow: 1;
+}
+
+.chat-name {
+  font-weight: bold;
+}
+
+.chat-last-message {
+  color: #888;
+  font-size: 0.9em;
+}
+
+.chat-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.chat-timestamp {
+  font-size: 0.8em;
+  color: #888;
+}
+
+.chat-unread-count {
+  background-color: #007bff; /* Example color, can be WhatsApp green */
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.7em;
+  margin-top: 5px;
+}
+
+.ai-indicator {
+  margin-left: 5px;
+  font-size: 1.2em;
+  color: #007bff; /* AI accent color from UIplan.md */
+}
+
+.pane2-conversation {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-right: 1px solid #ccc;
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  background-color: #f0f0f0;
+}
+
+.chat-header h3 {
+  margin: 0;
+  color: #333; /* Ensure contact name is visible */
+}
+
+.summarize-button {
+  background-color: #007bff; /* AI accent color */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.summarize-button:hover {
+  background-color: #0056b3;
+}
+
+.message-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.message-bubble {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.message-bubble.me {
+  align-self: flex-end;
+  background-color: #dcf8c6; /* WhatsApp green for sent messages */
+}
+
+.message-bubble.other {
+  align-self: flex-start;
+  background-color: #ffffff; /* White for received messages */
+  border: 1px solid #eee;
+}
+
+.message-text {
+  margin: 0;
+  word-wrap: break-word;
+  color: #333; /* Ensure text is visible */
+}
+
+.message-timestamp {
+  font-size: 0.7em;
+  color: #888;
+  align-self: flex-end;
+  margin-top: 5px;
+}
+
+.ai-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2em;
+  cursor: pointer;
+  color: #007bff; /* AI accent color */
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  padding: 2px;
+}
+
+.message-bubble.me .ai-icon {
+  left: -25px; /* Position to the left of 'me' bubbles */
+}
+
+.message-bubble.other .ai-icon {
+  right: -25px; /* Position to the right of 'other' bubbles */
+}
+
+.message-input-box {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #eee;
+  background-color: #f0f0f0;
+}
+
+.message-input-box input {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  margin-right: 10px;
+}
+
+.message-input-box button {
+  background-color: #007bff; /* AI accent color or WhatsApp green */
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.message-input-box button.ai-button {
+  background-color: transparent;
+  color: #007bff;
+  font-size: 1.5em;
+  padding: 0 5px;
+  margin-right: 5px;
+}
+
+.message-input-box button:hover {
+  opacity: 0.9;
+}
+
+/* Pane 3 AI Panel */
+.pane3-ai-panel {
+  border-left: 1px solid #ccc;
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tabs Component */
+.tabs-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tabs-header {
+  display: flex;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.tab-button {
+  background-color: #f0f0f0;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #333; /* Darker text for better visibility */
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.tab-button:hover {
+  background-color: #e0e0e0;
+}
+
+.tab-button.active {
+  background-color: #ffffff;
+  color: #007bff; /* AI accent color */
+  border-bottom: 2px solid #007bff; /* AI accent color */
+}
+
+.tabs-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-top: 10px;
+}
+
+/* CoPilotView */
+.co-pilot-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.message-list-area {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.message-list-area p {
+  margin-bottom: 5px;
+  line-height: 1.4;
+  color: #333; /* Ensure text is clearly visible */
+}
+
+.input-box-area {
+  display: flex;
+  padding: 5px;
+  border-top: 1px solid #eee;
+}
+
+.input-box-area input {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  margin-right: 10px;
+}
+
+.input-box-area button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+/* SummaryView, TasksView, DraftsView, FunctionsView */
+.summary-view,
+.tasks-view,
+.drafts-view,
+.functions-view {
+  padding: 10px;
+}
+
+.summary-view h3,
+.tasks-view h3,
+.drafts-view h3,
+.functions-view h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.summary-view ul,
+.tasks-view ul,
+.drafts-view ul,
+.functions-view ul {
+  list-style: none;
+  padding: 0;
+}
+
+.summary-view li,
+.tasks-view li,
+.drafts-view li,
+.functions-view li {
+  background-color: #f0f0f0;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #333; /* Ensure text is clearly visible */
+}
+
+.functions-view label {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.functions-view input[type="checkbox"] {
+  margin-right: 10px;
+  transform: scale(1.2);
+}
