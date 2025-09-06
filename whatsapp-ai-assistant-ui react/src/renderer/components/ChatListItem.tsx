@@ -1,30 +1,24 @@
 import React from 'react';
-
-interface Chat {
-  id: number;
-  name: string;
-  lastMessage: string;
-  timestamp: string;
-  avatar: string;
-  unread: number;
-  aiActivity: string | null;
-}
+import useStore, { Chat } from '../store';
 
 interface ChatListItemProps {
   chat: Chat;
 }
 
 const ChatListItem: React.FC<ChatListItemProps> = ({ chat }) => {
+  const activeChatId = useStore((state) => state.activeChatId);
+  const lastMessage = chat.messages.length > 0 ? chat.messages[chat.messages.length - 1] : null;
+
   return (
-    <div className={`chat-list-item ${chat.id === 1 ? 'active' : ''}`}> {/* Assuming chat with id 1 is active for now */}
+    <div className={`chat-list-item ${chat.id === activeChatId ? 'active' : ''}`}>
       <img src={chat.avatar} alt={`${chat.name}'s avatar`} className="chat-avatar" />
       <div className="chat-info">
         <div className="chat-name">{chat.name}</div>
-        <div className="chat-last-message">{chat.lastMessage}</div>
+        {lastMessage && <div className="chat-last-message">{lastMessage.text}</div>}
       </div>
       <div className="chat-meta">
-        <div className="chat-timestamp">{chat.timestamp}</div>
-        {chat.unread > 0 && <div className="chat-unread-count">{chat.unread}</div>}
+        {lastMessage && <div className="chat-timestamp">{lastMessage.timestamp}</div>}
+        {chat.unreadCount > 0 && <div className="chat-unread-count">{chat.unreadCount}</div>}
         {chat.aiActivity && <div className="ai-indicator">✨</div>}
       </div>
     </div>

@@ -3,40 +3,26 @@
 This document outlines the current state of the Electron-Vite-React application after initial setup and restructuring.
 
 ## Project Initialization
-- An Electron project was initialized using `electron-vite` with the `react` template.
-- Project directory: `whatsapp-ai-assistant-ui react`
-- Dependencies were installed using `npm install`.
+- Electron project initialized with `electron-vite` and `react` template.
+- Dependencies installed.
 
 ## Project Structure
-The project has been restructured to follow a clear separation of concerns for Electron's main, preload, and renderer processes.
+The project follows a clear separation of concerns for Electron's main, preload, and renderer processes.
 
 ```
 whatsapp-ai-assistant-ui react/
 ├── public/
 ├── src/
-│   ├── main/             # Electron Main Process (e.g., main.ts, electron-env.d.ts)
-│   ├── preload/          # Electron Preload Script (e.g., preload.ts)
+│   ├── main/             # Electron Main Process
+│   ├── preload/          # Electron Preload Script
 │   └── renderer/         # React Application (UI)
 │       ├── assets/
-│       ├── components/   # UI Components
-│       │   ├── CoPilotView.tsx
-│       │   ├── ChatHeader.tsx
-│       │   ├── ChatListItem.tsx
-│       │   ├── DraftsView.tsx
-│       │   ├── FunctionsView.tsx
-│       │   ├── MainLayout.tsx
-│       │   ├── MessageBubble.tsx
-│       │   ├── MessageInputBox.tsx
-│       │   ├── Pane1_ChatList.tsx
-│       │   ├── Pane2_Conversation.tsx
-│       │   ├── Pane3_AIPanel.tsx
-│       │   ├── SummaryView.tsx
-│       │   ├── Tabs.tsx
-│       │   └── TasksView.tsx
+│       ├── components/   # Reusable UI Components
 │       ├── App.css
 │       ├── App.tsx
 │       ├── index.css
 │       ├── main.tsx
+│       ├── store.ts          # Zustand store for state management
 │       └── vite-env.d.ts
 ├── .eslintrc.cjs
 ├── .gitignore
@@ -52,61 +38,22 @@ whatsapp-ai-assistant-ui react/
 
 ## Key Changes & Configurations
 
-### `vite.config.ts`
-- Updated `main` entry to `src/main/main.ts`.
-- Updated `preload` input to `src/preload/preload.ts`.
+### Core Setup
+- `vite.config.ts`: Updated entry points for main and preload processes.
+- `index.html`: Updated script source for the renderer process.
+- `src/renderer/App.css`: Configured `.main-layout` for a three-column CSS Grid layout.
+- `src/renderer/components/MainLayout.tsx`: Main container component for the application.
 
-### `index.html`
-- Updated the script source to `src/renderer/main.tsx` to reflect the new renderer path.
+### UI Pane Implementations
+- **Pane 1: Chat List & Navigation:** Implemented with mock chat data, `ChatListItem` components, a global search bar, and filter buttons. Styles applied for WhatsApp visual language and dark mode.
+- **Pane 2: Conversation View:** Implemented with `ChatHeader`, `MessageBubble`, and `MessageInputBox` components. Displays messages for the active chat. Styles applied for WhatsApp visual language and dark mode.
+- **Pane 3: AI Co-pilot Panel:** Implemented with `Tabs` component and individual view components (`CoPilotView`, `SummaryView`, `TasksView`, `DraftsView`, `FunctionsView`). Styles applied for WhatsApp visual language and dark mode.
+- **`src/renderer/App.tsx`:** Renders `MainLayout` and defaults to dark mode.
 
-### `src/renderer/App.css`
-- Removed default `#root` styling.
-- Added `.main-layout` CSS using CSS Grid for a three-column layout:
-  ```css
-  .main-layout {
-    display: grid;
-    grid-template-columns: 300px 1fr 350px; /* Adjust widths as needed */
-    height: 100vh;
-    width: 100vw;
-  }
-  ```
-
-### `src/renderer/components/MainLayout.tsx`
-- A React functional component that acts as the main container for the application, applying the `.main-layout` CSS class.
-
-### Pane 1: Chat List & Navigation (Implemented)
-- Created [`src/renderer/mock-data.ts`](src/renderer/mock-data.ts) with mock chat data.
-- Created [`src/renderer/components/ChatListItem.tsx`](src/renderer/components/ChatListItem.tsx) component to display individual chat items, including a conditional AI indicator.
-- Modified [`src/renderer/components/Pane1_ChatList.tsx`](src/renderer/components/Pane1_ChatList.tsx) to:
-    - Import and map over the mock chat data to render `ChatListItem` components.
-    - Add a global search bar and filter buttons.
-- Updated [`src/renderer/App.css`](src/renderer/App.css) with styles for the chat list, chat list items, search bar, filter buttons, and AI indicator, applying WhatsApp's visual language and dark mode theming. Removed default Vite/Electron related CSS and improved filter button readability.
-
-### Pane 2: Conversation View (Implemented)
-- Created [`src/renderer/components/ChatHeader.tsx`](src/renderer/components/ChatHeader.tsx) component for the chat header with contact name and "Summarize Chat" button.
-- Created [`src/renderer/components/MessageBubble.tsx`](src/renderer/components/MessageBubble.tsx) component to display individual messages with sender, text, and timestamp, including a hover effect to reveal an AI icon (✨).
-- Created [`src/renderer/components/MessageInputBox.tsx`](src/renderer/components/MessageInputBox.tsx) component for the message input area with an AI button (✨) and a send button.
-- Modified [`src/renderer/components/Pane2_Conversation.tsx`](src/renderer/components/Pane2_Conversation.tsx) to:
-    - Integrate `ChatHeader`, `MessageBubble`, and `MessageInputBox` components.
-    - Hardcode a series of `MessageBubble` components to simulate a chat.
-- Updated [`src/renderer/App.css`](src/renderer/App.css) with styles for `ChatHeader`, `MessageBubble`, and `MessageInputBox`, applying WhatsApp's visual language and dark mode theming, including message status ticks and fixes for text visibility.
-
-### Pane 3: AI Co-pilot Panel (Implemented)
-- Created [`src/renderer/components/Tabs.tsx`](src/renderer/components/Tabs.tsx) component for managing tab navigation.
-- Created individual view components for each tab:
-    - [`src/renderer/components/CoPilotView.tsx`](src/renderer/components/CoPilotView.tsx): Simple chat interface for AI interaction.
-    - [`src/renderer/components/SummaryView.tsx`](src/renderer/components/SummaryView.tsx): Displays static chat summaries.
-    - [`src/renderer/components/TasksView.tsx`](src/renderer/components/TasksView.tsx): Lists static tasks.
-    - [`src/renderer/components/DraftsView.tsx`](src/renderer/components/DraftsView.tsx): Shows static AI-suggested replies.
-    - [`src/renderer/components/FunctionsView.tsx`](src/renderer/components/FunctionsView.tsx): Lists AI features with toggle switches.
-- Modified [`src/renderer/components/Pane3_AIPanel.tsx`](src/renderer/components/Pane3_AIPanel.tsx) to:
-    - Integrate the `Tabs` component.
-    - Conditionally render `CoPilotView`, `SummaryView`, `TasksView`, `DraftsView`, and `FunctionsView` based on the active tab.
-- Updated [`src/renderer/App.css`](src/renderer/App.css) with styles for the `Tabs` component and all Pane 3 view components, applying WhatsApp's visual language and dark mode theming, including fixes for text visibility.
-
-### `src/renderer/App.tsx`
-- The main application component now imports and renders `MainLayout` which in turn renders the three pane components.
-- Configured `src/renderer/App.tsx` to default to dark mode and removed the theme toggle button.
+### State Management with Zustand
+- Integrated Zustand for global state management, including chat data, active chat, and theme.
+- Implemented actions for setting active chat, marking chats as read, updating message statuses, toggling themes, and adding new messages.
+- Components (`Pane1_ChatList.tsx`, `ChatListItem.tsx`, `Pane2_Conversation.tsx`, `MessageBubble.tsx`) are connected to the Zustand store for dynamic UI updates and message sending functionality.
 
 ## Next Steps
-The application now has a foundational structure and a basic three-pane UI layout, with Pane 1, Pane 2, and Pane 3 fully implemented with placeholder content, and a consistent WhatsApp visual language applied across light and dark themes. Further development will involve implementing the core functionalities outlined in the `whatsapp_ai_assistant_roadmap.md` and `UIplan.md`.
+The application has a foundational structure and a basic three-pane UI layout, with all panes implemented and a consistent WhatsApp visual language applied. State management has been integrated using Zustand, making the UI dynamic and responsive. Further development will involve implementing the core functionalities outlined in the `whatsapp_ai_assistant_roadmap.md` and `UIplan.md`.

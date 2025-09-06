@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
+import { Message } from '../store';
 
 interface MessageBubbleProps {
-  text: string;
-  sender: 'me' | 'other';
-  timestamp: string;
-  status?: 'sent' | 'delivered' | 'read'; // Added status prop
+  message: Message;
 }
 
-const MessageBubble: React.FC<MessageBubbleProps> = ({ text, sender, timestamp, status }) => {
+const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
+  const { text, sender, timestamp, status } = message;
   const [showAiIcon, setShowAiIcon] = useState(false);
 
   const renderStatusTicks = () => {
