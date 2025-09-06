@@ -1,16 +1,59 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Brand Colors */
+  --brand-green: #008069; /* Header, buttons, icons */
+  --brand-green-light: #25D366; /* Notification badges, Send button */
+  
+  /* Backgrounds */
+  --app-bg: #EAE6DF; /* Main app background (behind panes) */
+  --pane-1-bg: #FFFFFF; /* Chat list background */
+  --pane-2-bg: #ECE5DD; /* Chat conversation background */
+  --chat-bg-pattern: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); /* Classic WhatsApp doodle pattern */
+  
+  /* Bubbles */
+  --outgoing-bubble-bg: #D9FDD3;
+  --incoming-bubble-bg: #FFFFFF;
+  
+  /* Text */
+  --text-primary: #303030;
+  --text-secondary: #667781; /* Timestamps, status text */
+  --text-link: #34B7F1;
+  
+  /* UI Elements */
+  --active-chat-bg: #F0F2F5;
+  --icon-color: #54656F;
+  --border-color: #e9edef;
+  --search-bar-bg: #F0F2F5;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* AI Accent (From your design doc) */
+  --ai-accent: #007BFF;
+  --ai-accent-subtle-bg: rgba(0, 123, 255, 0.1);
+}
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+[data-theme='dark'] {
+  /* Brand Colors */
+  --brand-green: #00A884;
+  --brand-green-light: #25D366;
+  
+  /* Backgrounds */
+  --app-bg: #0b141a;
+  --pane-1-bg: #111B21;
+  --pane-2-bg: #0b141a;
+  --chat-bg-pattern: url('https://raw.githubusercontent.com/Telegram-FOSS-Team/Telegram-FOSS/master/TMessagesProj/src/main/res/drawable-nodpi/bg_doodle_dark.png'); /* A dark doodle pattern */
+
+  /* Bubbles */
+  --outgoing-bubble-bg: #005C4B;
+  --incoming-bubble-bg: #202C33;
+  
+  /* Text */
+  --text-primary: #E9EDEF;
+  --text-secondary: #8696A0;
+  --text-link: #53BDEB;
+  
+  /* UI Elements */
+  --active-chat-bg: #202C33;
+  --icon-color: #AEBAC1;
+  --border-color: #222e35;
+  --search-bar-bg: #202C33;
 }
 
 a {
@@ -24,10 +67,15 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--app-bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+#pane-2-conversation-area {
+  background-color: var(--pane-2-bg);
+  background-image: var(--chat-bg-pattern);
 }
 
 h1 {
@@ -54,15 +102,3 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
-}

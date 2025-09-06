@@ -4,10 +4,27 @@ interface MessageBubbleProps {
   text: string;
   sender: 'me' | 'other';
   timestamp: string;
+  status?: 'sent' | 'delivered' | 'read'; // Added status prop
 }
 
-const MessageBubble: React.FC<MessageBubbleProps> = ({ text, sender, timestamp }) => {
+const MessageBubble: React.FC<MessageBubbleProps> = ({ text, sender, timestamp, status }) => {
   const [showAiIcon, setShowAiIcon] = useState(false);
+
+  const renderStatusTicks = () => {
+    if (sender === 'me') {
+      let tickClass = 'message-status-ticks';
+      if (status === 'read') {
+        tickClass += ' read';
+      }
+      return (
+        <span className={tickClass}>
+          {status === 'sent' && '✓'}
+          {(status === 'delivered' || status === 'read') && '✓✓'}
+        </span>
+      );
+    }
+    return null;
+  };
 
   const handleAiIconClick = () => {
     console.log('AI icon clicked for message:', text);
@@ -20,7 +37,10 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ text, sender, timestamp }
       onMouseLeave={() => setShowAiIcon(false)}
     >
       <p className="message-text">{text}</p>
-      <span className="message-timestamp">{timestamp}</span>
+      <div className="message-metadata">
+        <span className="message-timestamp">{timestamp}</span>
+        {renderStatusTicks()}
+      </div>
       {showAiIcon && (
         <span className="ai-icon" onClick={handleAiIconClick}>
           ✨

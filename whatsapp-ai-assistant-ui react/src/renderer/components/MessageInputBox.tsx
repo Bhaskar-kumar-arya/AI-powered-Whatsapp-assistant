@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Send, Sparkles } from 'lucide-react'; // Import Send and Sparkles icons
 
 interface MessageInputBoxProps {
   onSendMessage: (message: string) => void;
@@ -21,7 +22,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = ({ onSendMessage }) => {
   return (
     <div className="message-input-box">
       <button className="ai-button" onClick={handleAiButtonClick}>
-        ✨
+        <Sparkles size={20} />
       </button>
       <input
         type="text"
@@ -35,7 +36,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = ({ onSendMessage }) => {
         }}
       />
       <button className="send-button" onClick={handleSend}>
-        Send
+        <Send size={20} />
       </button>
     </div>
   );

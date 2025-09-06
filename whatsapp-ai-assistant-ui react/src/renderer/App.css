@@ -8,11 +8,13 @@
 }
 
 .pane1-chatlist {
-  border-right: 1px solid #ccc;
+  border-right: 1px solid var(--border-color);
   padding: 10px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  background-color: var(--pane-1-bg);
+  color: var(--text-primary);
 }
 
 .chat-list-header {
@@ -22,9 +24,11 @@
 .global-search-bar {
   width: 100%;
   padding: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   border-radius: 5px;
   margin-bottom: 10px;
+  background-color: var(--search-bar-bg);
+  color: var(--text-primary);
 }
 
 .filter-buttons {
@@ -33,8 +37,8 @@
 }
 
 .filter-button {
-  background-color: #f0f0f0; /* Lighter background */
-  color: #333; /* Darker text for contrast */
+  background-color: var(--search-bar-bg); /* Use search bar bg for filter buttons */
+  color: var(--text-primary); /* Primary text for contrast */
   border: none;
   padding: 8px 12px;
   border-radius: 5px;
@@ -42,7 +46,7 @@
 }
 
 .filter-button:hover {
-  background-color: #e0e0e0; /* Slightly darker on hover */
+  background-color: var(--active-chat-bg); /* Active chat bg on hover */
 }
 
 .chat-list-container {
@@ -54,12 +58,17 @@
   display: flex;
   align-items: center;
   padding: 10px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
   cursor: pointer;
+  background-color: transparent; /* Default transparent background */
 }
 
 .chat-list-item:hover {
-  background-color: #f0f0f0;
+  background-color: var(--active-chat-bg);
+}
+
+.chat-list-item.active {
+  background-color: var(--active-chat-bg); /* Active chat background */
 }
 
 .chat-avatar {
@@ -78,7 +87,7 @@
 }
 
 .chat-last-message {
-  color: #888;
+  color: var(--text-secondary);
   font-size: 0.9em;
 }
 
@@ -90,29 +99,32 @@
 
 .chat-timestamp {
   font-size: 0.8em;
-  color: #888;
+  color: var(--text-secondary);
 }
 
 .chat-unread-count {
-  background-color: #007bff; /* Example color, can be WhatsApp green */
+  background-color: var(--brand-green-light);
   color: white;
   border-radius: 50%;
   padding: 2px 6px;
   font-size: 0.7em;
   margin-top: 5px;
+  min-width: 15px; /* Ensure it's a circle even with single digit */
+  text-align: center;
 }
 
 .ai-indicator {
   margin-left: 5px;
   font-size: 1.2em;
-  color: #007bff; /* AI accent color from UIplan.md */
+  color: var(--ai-accent); /* AI accent color from UIplan.md */
 }
 
 .pane2-conversation {
   display: flex;
   flex-direction: column;
   height: 100%;
-  border-right: 1px solid #ccc;
+  border-right: 1px solid var(--border-color);
+  background-color: var(--pane-2-bg); /* Apply chat conversation background */
 }
 
 .chat-header {
@@ -120,17 +132,18 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  border-bottom: 1px solid #eee;
-  background-color: #f0f0f0;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--pane-1-bg); /* Use pane-1-bg for header */
+  color: var(--text-primary);
 }
 
 .chat-header h3 {
   margin: 0;
-  color: #333; /* Ensure contact name is visible */
+  color: var(--text-primary); /* Ensure contact name is visible */
 }
 
 .summarize-button {
-  background-color: #007bff; /* AI accent color */
+  background-color: var(--ai-accent); /* AI accent color */
   color: white;
   border: none;
   padding: 8px 12px;
@@ -139,7 +152,8 @@
 }
 
 .summarize-button:hover {
-  background-color: #0056b3;
+  background-color: var(--ai-accent); /* Keep AI accent on hover for consistency */
+  opacity: 0.9;
 }
 
 .message-list {
@@ -148,6 +162,8 @@
   padding: 10px;
   display: flex;
   flex-direction: column;
+  background-color: var(--pane-2-bg); /* Apply chat conversation background */
+  background-image: var(--chat-bg-pattern); /* Apply chat background pattern */
 }
 
 .message-bubble {
@@ -156,32 +172,48 @@
   max-width: 70%;
   margin-bottom: 10px;
   padding: 8px 12px;
-  border-radius: 10px;
+  border-radius: 8px; /* Rounded corners */
   position: relative;
+  box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13); /* Subtle box-shadow for depth */
 }
 
 .message-bubble.me {
   align-self: flex-end;
-  background-color: #dcf8c6; /* WhatsApp green for sent messages */
+  background-color: var(--outgoing-bubble-bg);
 }
 
 .message-bubble.other {
   align-self: flex-start;
-  background-color: #ffffff; /* White for received messages */
-  border: 1px solid #eee;
+  background-color: var(--incoming-bubble-bg);
+  border: 1px solid var(--border-color);
 }
 
 .message-text {
   margin: 0;
   word-wrap: break-word;
-  color: #333; /* Ensure text is visible */
+  color: var(--text-primary); /* Ensure text is visible */
+}
+
+.message-metadata {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Space between timestamp and status ticks */
+  margin-top: 5px;
+  align-self: flex-end;
 }
 
 .message-timestamp {
   font-size: 0.7em;
-  color: #888;
-  align-self: flex-end;
-  margin-top: 5px;
+  color: var(--text-secondary);
+}
+
+.message-status-ticks {
+  font-size: 0.7em;
+  color: var(--text-secondary);
+}
+
+.message-status-ticks.read {
+  color: var(--text-link);
 }
 
 .ai-icon {
@@ -190,10 +222,11 @@
   transform: translateY(-50%);
   font-size: 1.2em;
   cursor: pointer;
-  color: #007bff; /* AI accent color */
-  background-color: rgba(255, 255, 255, 0.8);
+  color: var(--ai-accent); /* AI accent color */
+  background-color: var(--incoming-bubble-bg); /* Use incoming bubble bg for contrast */
   border-radius: 50%;
   padding: 2px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .message-bubble.me .ai-icon {
@@ -207,20 +240,22 @@
 .message-input-box {
   display: flex;
   padding: 10px;
-  border-top: 1px solid #eee;
-  background-color: #f0f0f0;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--search-bar-bg); /* Use search bar bg for input area */
 }
 
 .message-input-box input {
   flex-grow: 1;
   padding: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   border-radius: 20px;
   margin-right: 10px;
+  background-color: var(--pane-1-bg); /* White background for input field */
+  color: var(--text-primary);
 }
 
 .message-input-box button {
-  background-color: #007bff; /* AI accent color or WhatsApp green */
+  background-color: var(--brand-green-light); /* WhatsApp green for send button */
   color: white;
   border: none;
   padding: 8px 15px;
@@ -230,7 +265,7 @@
 
 .message-input-box button.ai-button {
   background-color: transparent;
-  color: #007bff;
+  color: var(--ai-accent);
   font-size: 1.5em;
   padding: 0 5px;
   margin-right: 5px;
@@ -242,11 +277,13 @@
 
 /* Pane 3 AI Panel */
 .pane3-ai-panel {
-  border-left: 1px solid #ccc;
+  border-left: 1px solid var(--border-color);
   padding: 10px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  background-color: var(--pane-1-bg); /* Consistent background with Pane 1 */
+  color: var(--text-primary);
 }
 
 /* Tabs Component */
@@ -259,28 +296,28 @@
 .tabs-header {
   display: flex;
   margin-bottom: 10px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .tab-button {
-  background-color: #f0f0f0;
+  background-color: var(--search-bar-bg); /* Use search bar bg for inactive tabs */
   border: none;
   padding: 10px 15px;
   cursor: pointer;
   font-weight: bold;
-  color: #333; /* Darker text for better visibility */
+  color: var(--text-secondary); /* Secondary text for inactive tabs */
   border-bottom: 2px solid transparent;
   transition: all 0.3s ease;
 }
 
 .tab-button:hover {
-  background-color: #e0e0e0;
+  background-color: var(--active-chat-bg);
 }
 
 .tab-button.active {
-  background-color: #ffffff;
-  color: #007bff; /* AI accent color */
-  border-bottom: 2px solid #007bff; /* AI accent color */
+  background-color: var(--pane-1-bg); /* White background for active tab */
+  color: var(--ai-accent); /* AI accent color */
+  border-bottom: 2px solid var(--ai-accent); /* AI accent color */
 }
 
 .tabs-content {
@@ -300,7 +337,7 @@
   flex-grow: 1;
   overflow-y: auto;
   padding: 10px;
-  background-color: #f9f9f9;
+  background-color: var(--app-bg); /* Use app bg for co-pilot message list */
   border-radius: 5px;
   margin-bottom: 10px;
 }
@@ -308,25 +345,32 @@
 .message-list-area p {
   margin-bottom: 5px;
   line-height: 1.4;
-  color: #333; /* Ensure text is clearly visible */
+  color: var(--text-primary); /* Ensure text is clearly visible */
+}
+
+.message-list-area p.ai-message {
+  color: var(--ai-accent);
+  font-weight: bold;
 }
 
 .input-box-area {
   display: flex;
   padding: 5px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border-color);
 }
 
 .input-box-area input {
   flex-grow: 1;
   padding: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   border-radius: 20px;
   margin-right: 10px;
+  background-color: var(--pane-1-bg);
+  color: var(--text-primary);
 }
 
 .input-box-area button {
-  background-color: #007bff;
+  background-color: var(--ai-accent);
   color: white;
   border: none;
   padding: 8px 15px;
@@ -348,7 +392,7 @@
 .functions-view h3 {
   margin-top: 0;
   margin-bottom: 15px;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .summary-view ul,
@@ -363,14 +407,44 @@
 .tasks-view li,
 .drafts-view li,
 .functions-view li {
-  background-color: #f0f0f0;
+  background-color: var(--search-bar-bg); /* Use search bar bg for list items */
   padding: 10px;
   margin-bottom: 8px;
   border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #333; /* Ensure text is clearly visible */
+  color: var(--text-primary); /* Ensure text is clearly visible */
+}
+
+/* AI Context Menu */
+.ai-context-menu {
+  background-color: var(--ai-accent-subtle-bg);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  z-index: 10;
+}
+
+.ai-context-menu button {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  padding: 8px 10px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ai-context-menu button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* AI-Generated Content in Pane 3 */
+.pane3-ai-panel .message-bubble.ai-generated {
+  border-left: 4px solid var(--ai-accent);
+  background-color: var(--incoming-bubble-bg); /* Use incoming bubble bg for AI messages */
 }
 
 .functions-view label {

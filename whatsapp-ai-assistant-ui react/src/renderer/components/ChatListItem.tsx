@@ -16,7 +16,7 @@ interface ChatListItemProps {
 
 const ChatListItem: React.FC<ChatListItemProps> = ({ chat }) => {
   return (
-    <div className="chat-list-item">
+    <div className={`chat-list-item ${chat.id === 1 ? 'active' : ''}`}> {/* Assuming chat with id 1 is active for now */}
       <img src={chat.avatar} alt={`${chat.name}'s avatar`} className="chat-avatar" />
       <div className="chat-info">
         <div className="chat-name">{chat.name}</div>
