@@ -21,6 +21,14 @@ export const getChatsForUI = async (): Promise<PreloadChat[]> => {
   return chatsWithMetadata;
 };
 
+export const sendMessage = async (chatId: string, message: string): Promise<void> => {
+  await window.api.whatsapp.sendMessage(chatId, message);
+};
+
+export const onNewMessage = (callback: (chatId: string, message: PreloadMessage) => void): (() => void) => {
+  return window.api.whatsapp.onNewMessage(callback);
+};
+
 export const fetchMoreChatAvatars = async (chatIds: string[]): Promise<{ [chatId: string]: string }> => {
   const avatars: { [chatId: string]: string } = {};
   await Promise.all(

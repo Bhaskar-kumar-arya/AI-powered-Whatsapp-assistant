@@ -129,6 +129,7 @@
   height: 100%;
   border-right: 1px solid var(--border-color);
   background-color: var(--pane-2-bg); /* Apply chat conversation background */
+  overflow: hidden; /* Ensure content within this pane is clipped */
 }
 
 .chat-header {
@@ -168,6 +169,7 @@
   flex-direction: column;
   background-color: var(--pane-2-bg); /* Apply chat conversation background */
   background-image: var(--chat-bg-pattern); /* Apply chat background pattern */
+  min-height: 0; /* Allow the flex item to shrink */
 }
 
 .message-bubble {

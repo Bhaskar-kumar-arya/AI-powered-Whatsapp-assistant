@@ -9,7 +9,15 @@ const api = {
     },
     getAllChats: () => ipcRenderer.invoke('whatsapp-get-chats'),
     getChatPictureUrl: (chatId: string) => ipcRenderer.invoke('whatsapp-get-chat-picture-url', chatId),
-    getChatsForUI: () => ipcRenderer.invoke('whatsapp-get-chats-for-ui')
+    getChatsForUI: () => ipcRenderer.invoke('whatsapp-get-chats-for-ui'),
+    sendMessage: (chatId: string, message: string) => ipcRenderer.invoke('whatsapp-send-message', chatId, message),
+    onNewMessage: (callback: (chatId: string, message: Message) => void) => {
+      const handler = (_event, chatId, message) => callback(chatId, message);
+      ipcRenderer.on('new-message', handler);
+      return () => {
+        ipcRenderer.removeListener('new-message', handler);
+      };
+    }
   }
 }
 

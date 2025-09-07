@@ -8,6 +8,8 @@ declare global {
         on: (channel: string, callback: (...args: any[]) => void) => void
         getChatPictureUrl: (chatId: string) => Promise<string | undefined>
         getChatsForUI: () => Promise<Chat[]>
+        sendMessage: (chatId: string, message: string) => Promise<void>
+        onNewMessage: (callback: (chatId: string, message: Message) => void) => () => void
       }
     }
   }
@@ -19,6 +21,7 @@ declare global {
     fromMe: boolean;
     hasMedia: boolean;
     hasQuotedMsg: boolean;
+    status?: 'pending' | 'sent' | 'delivered' | 'read' | 'failed';
   }
 
   export interface Chat {

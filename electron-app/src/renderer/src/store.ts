@@ -3,7 +3,7 @@ import { Chat as PreloadChat, Message as PreloadMessage } from '../../preload/in
 
 // Define types for your data, extending the preload types with UI-specific properties
 export interface Message extends PreloadMessage {
-  status: 'sent' | 'delivered' | 'read'; // Crucial for ticks
+  status?: 'pending' | 'sent' | 'delivered' | 'read' | 'failed'; // Crucial for ticks, now optional and includes pending/failed
 }
 
 export interface Chat extends PreloadChat {
@@ -19,9 +19,9 @@ interface AppState {
   // Actions
   setActiveChat: (id: string) => void;
   markChatAsRead: (id: string) => void;
-  updateMessageStatus: (chatId: string, messageId: string, status: 'delivered' | 'read') => void;
+  updateMessageStatus: (chatId: string, messageId: string, status: 'sent' | 'delivered' | 'read' | 'failed') => void;
   toggleTheme: () => void;
-  addMessage: (chatId: string, text: string, fromMe: boolean) => void;
+  addMessage: (chatId: string, message: Message) => void; // Modified to accept a full Message object
   setAiSummary: (summary: string | null) => void; // New action to set AI summary
   setChats: (chats: Chat[]) => void; // New action to set chats
   fetchChats: () => Promise<void>; // New action to fetch chats
@@ -35,12 +35,18 @@ const useStore = create<AppState>((set) => ({
 
   setActiveChat: (id: string) => set(() => ({ activeChatId: id })),
   markChatAsRead: (id: string) =>
-    set((state) => ({
-      chats: state.chats.map((chat) =>
-        chat.id === id ? { ...chat, unreadCount: 0 } : chat
-      ),
-    })),
-  updateMessageStatus: (chatId: string, messageId: string, status: 'delivered' | 'read') =>
+    set((state) => {
+      const chatToMark = state.chats.find(chat => chat.id === id);
+      if (chatToMark && chatToMark.unreadCount > 0) {
+        return {
+          chats: state.chats.map((chat) =>
+            chat.id === id ? { ...chat, unreadCount: 0 } : chat
+          ),
+        };
+      }
+      return state; // No change if chat not found or already read
+    }),
+  updateMessageStatus: (chatId: string, messageId: string, status: 'sent' | 'delivered' | 'read' | 'failed') =>
     set((state) => ({
       chats: state.chats.map((chat) =>
         chat.id === chatId
@@ -57,28 +63,28 @@ const useStore = create<AppState>((set) => ({
     set((state) => ({
       theme: state.theme === 'light' ? 'dark' : 'light',
     })),
-  addMessage: (chatId: string, text: string, fromMe: boolean) =>
-    set((state) => ({
-      chats: state.chats.map((chat) =>
+  addMessage: (chatId: string, message: Message) =>
+    set((state) => {
+      const updatedChats = state.chats.map((chat) =>
         chat.id === chatId
           ? {
               ...chat,
-              messages: [
-                ...chat.messages,
-                {
-                  id: `msg-${chatId}-${chat.messages.length + 1}`,
-                  body: text,
-                  timestamp: Date.now(),
-                  fromMe,
-                  hasMedia: false,
-                  hasQuotedMsg: false,
-                  status: fromMe ? 'sent' : 'read', // Default status for new messages
-                },
-              ],
+              messages: [...chat.messages, message],
+              lastMessage: message, // Update lastMessage with the new message
+              timestamp: message.timestamp, // Update chat timestamp for sorting
             }
           : chat
-      ),
-    })),
+      );
+
+      // Re-sort chats to place the one with the latest message at the top
+      const sortedChats = updatedChats.sort((a, b) => {
+        const timestampA = a.lastMessage?.timestamp || 0;
+        const timestampB = b.lastMessage?.timestamp || 0;
+        return timestampB - timestampA;
+      });
+
+      return { chats: sortedChats };
+    }),
   setAiSummary: (summary: string | null) => set(() => ({ aiSummary: summary })),
   setChats: (chats: Chat[]) => set(() => ({ chats })), // New action to set chats
   fetchChats: async () => {

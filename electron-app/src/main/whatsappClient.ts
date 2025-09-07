@@ -49,12 +49,37 @@ export function initializeWhatsappClient(mainWindow: BrowserWindow): void {
     console.log('Client was disconnected', reason)
     mainWindow.webContents.send('whatsapp-disconnected', reason)
   })
+  
+  client.on('message', async (msg) => {
+    console.log('New message received:', msg.body);
 
-  client.initialize()
+    const chat = await msg.getChat();
+    console.log('From chat:', chat.name);
+
+    const mappedMessage: Message = {
+      id: msg.id._serialized,
+      body: msg.body,
+      timestamp: msg.timestamp,
+      fromMe: msg.fromMe,
+      hasMedia: msg.hasMedia,
+      hasQuotedMsg: msg.hasQuotedMsg
+    };
+    mainWindow.webContents.send('new-message', chat.id._serialized, mappedMessage);
+  });
+
+  client.initialize();
+}
+
+export async function sendMessage(chatId: string, message: string): Promise<void> {
+  await clientReadyPromise;
+  if (!client) {
+    throw new Error('Whatsapp client not initialized.');
+  }
+  await client.sendMessage(chatId, message);
 }
 
 export function getWhatsappClient(): Client | null {
-  return client
+  return client;
 }
 
 import { Message, Chat } from '../preload/index.d'

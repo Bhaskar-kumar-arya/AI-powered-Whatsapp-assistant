@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { initializeWhatsappClient, getChatPictureUrl, getChatsForUI } from './whatsappClient'
+import { initializeWhatsappClient, getChatPictureUrl, getChatsForUI, sendMessage } from './whatsappClient'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -87,6 +87,15 @@ app.whenReady().then(() => {
     } catch (error) {
       console.error('Error getting chats for UI:', error)
       return []
+    }
+  })
+
+  // Handle IPC call to send a message
+  ipcMain.handle('whatsapp-send-message', async (_event, chatId: string, message: string) => {
+    try {
+      await sendMessage(chatId, message)
+    } catch (error) {
+      console.error(`Error sending message to ${chatId}:`, error)
     }
   })
 })
