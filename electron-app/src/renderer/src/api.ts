@@ -5,77 +5,70 @@ import { Chat, Message } from './store'; // Assuming Chat and Message types are 
 // Utility to simulate network latency
 const simulateLatency = (ms: number = 500) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Mock Data (can be expanded as needed)
-const mockChats: Chat[] = [
-  {
-    id: 1,
-    name: 'Alice',
-    avatar: 'https://i.pravatar.cc/150?img=1',
-    messages: [
-      { id: 'msg1', text: 'Hi!', timestamp: '10:28 AM', sender: 'other', status: 'read' },
-      { id: 'msg2', text: 'Hello!', timestamp: '10:29 AM', sender: 'me', status: 'read' },
-      { id: 'msg3', text: 'Hey there!', timestamp: '10:30 AM', sender: 'other', status: 'read' },
-    ],
-    unreadCount: 1,
-  },
-  {
-    id: 2,
-    name: 'Bob',
-    avatar: 'https://i.pravatar.cc/150?img=2',
-    messages: [
-      { id: 'msg4', text: 'How are you?', timestamp: 'Yesterday', sender: 'other', status: 'read' },
-      { id: 'msg5', text: 'Good, thanks!', timestamp: 'Yesterday', sender: 'me', status: 'read' },
-      { id: 'msg6', text: 'See you later!', timestamp: 'Yesterday', sender: 'other', status: 'read' },
-    ],
-    unreadCount: 0,
-  },
-  {
-    id: 3,
-    name: 'Project Team',
-    avatar: 'https://i.pravatar.cc/150?img=3',
-    messages: [
-      { id: 'msg7', text: 'Meeting at 3 PM', timestamp: '09/01/2025', sender: 'other', status: 'read' },
-      { id: 'msg8', text: 'Got it!', timestamp: '09/01/2025', sender: 'other', status: 'read' },
-      { id: 'msg9', text: 'Will be there.', timestamp: '09/01/2025', sender: 'me', status: 'read' },
-    ],
-    unreadCount: 3,
-  },
-];
-
-// Helper to extract messages from mockChats for getMessages
-const getMessagesFromMockChats = (chatId: number): Message[] => {
-  const chat = mockChats.find(c => c.id === chatId);
-  return chat ? chat.messages : [];
+// Mock AI Responses (can be kept for AI summary mock)
+const mockAiSummaries: { [chatId: string]: string } = {
+  '1': 'This chat is a short greeting exchange between Alice and you.',
+  '2': 'This chat is a brief conversation with Bob about how you are doing.',
+  '3': 'This chat is about a project team meeting scheduled for 3 PM.',
 };
-
-// Mock AI Responses
-const mockAiSummaries: { [chatId: number]: string } = {
-  1: 'This chat is a short greeting exchange between Alice and you.',
-  2: 'This chat is a brief conversation with Bob about how you are doing.',
-  3: 'This chat is about a project team meeting scheduled for 3 PM.',
-};
-
 
 /**
- * Mocks fetching a list of chats.
+ * Fetches a list of chats from the main process.
  */
 export const getChats = async (): Promise<Chat[]> => {
-  await simulateLatency();
-  return mockChats;
+  await simulateLatency(); // Keep for consistent UX, remove if not needed
+  const whatsappChats = await window.api.whatsapp.getAllChats();
+
+  // Sort chats by timestamp in descending order (most recent first)
+  whatsappChats.sort((a: any, b: any) => b.timestamp - a.timestamp);
+
+  // Map whatsapp-web.js Chat objects to your Chat interface
+  const chats = await Promise.all(
+    whatsappChats.map(async (chat: any, index: number) => {
+      let avatar;
+      if (index < 25) { // Fetch avatars for the first 25 chats
+        avatar = await window.api.whatsapp.getChatPictureUrl(chat.id._serialized);
+      }
+      return {
+        id: chat.id._serialized, // Use _serialized as a unique ID
+        name: chat.name || chat.id._serialized, // Use chat name or ID
+        avatar: avatar, // No placeholder avatar
+        messages: [], // Messages will be fetched separately
+        unreadCount: chat.unreadCount || 0,
+        isGroup: chat.isGroup,
+      };
+    })
+  );
+  return chats;
+};
+
+export const fetchMoreChatAvatars = async (chatIds: string[]): Promise<{ [chatId: string]: string }> => {
+  const avatars: { [chatId: string]: string } = {};
+  await Promise.all(
+    chatIds.map(async (chatId) => {
+      const avatar = await window.api.whatsapp.getChatPictureUrl(chatId);
+      if (avatar) {
+        avatars[chatId] = avatar;
+      }
+    })
+  );
+  return avatars;
 };
 
 /**
  * Mocks fetching messages for a specific chat.
  */
-export const getMessages = async (chatId: number): Promise<Message[]> => {
+export const getMessages = async (chatId: string): Promise<Message[]> => {
   await simulateLatency();
-  return getMessagesFromMockChats(chatId);
+  // In a real scenario, you would fetch messages for the given chatId from the main process
+  // For now, we'll return an empty array or a mock if needed.
+  return [];
 };
 
 /**
  * Mocks an AI summary generation.
  */
-export const getAiSummary = async (chatId: number): Promise<string> => {
+export const getAiSummary = async (chatId: string): Promise<string> => {
   await simulateLatency(1500); // Longer latency for AI processing
   return mockAiSummaries[chatId] || 'No summary available for this chat.';
 };

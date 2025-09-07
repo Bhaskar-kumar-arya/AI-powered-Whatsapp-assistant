@@ -1,8 +1,8 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { initializeWhatsappClient } from './whatsappClient'
+import { initializeWhatsappClient, getAllChats, getChatPictureUrl } from './whatsappClient'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -65,6 +65,28 @@ app.whenReady().then(() => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+
+  // Handle IPC call to get chats
+  ipcMain.handle('whatsapp-get-chats', async () => {
+    try {
+      const chats = await getAllChats()
+      return chats
+    } catch (error) {
+      console.error('Error getting chats:', error)
+      return []
+    }
+  })
+
+  // Handle IPC call to get chat picture URL
+  ipcMain.handle('whatsapp-get-chat-picture-url', async (_event, chatId: string) => {
+    try {
+      const url = await getChatPictureUrl(chatId)
+      return url
+    } catch (error) {
+      console.error(`Error getting chat picture URL for ${chatId}:`, error)
+      return undefined
+    }
   })
 })
 

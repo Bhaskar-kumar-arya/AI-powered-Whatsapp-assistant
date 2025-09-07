@@ -6,7 +6,9 @@ const api = {
   whatsapp: {
     on: (channel: string, callback: (...args: unknown[]) => void) => {
       ipcRenderer.on(channel, (_event, ...args) => callback(...args))
-    }
+    },
+    getAllChats: () => ipcRenderer.invoke('whatsapp-get-chats'),
+    getChatPictureUrl: (chatId: string) => ipcRenderer.invoke('whatsapp-get-chat-picture-url', chatId)
   }
 }
 
