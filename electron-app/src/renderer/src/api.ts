@@ -16,7 +16,7 @@ const mockAiSummaries: { [chatId: string]: string } = {
  * Fetches a list of chats for the UI, including detailed metadata, from the main process.
  */
 export const getChatsForUI = async (): Promise<PreloadChat[]> => {
-  await simulateLatency(); // Keep for consistent UX, remove if not needed
+   // Keep for consistent UX, remove if not needed
   const chatsWithMetadata = await window.api.whatsapp.getChatsForUI();
   return chatsWithMetadata;
 };
@@ -46,7 +46,7 @@ export const fetchMoreChatAvatars = async (chatIds: string[]): Promise<{ [chatId
  * Mocks fetching messages for a specific chat.
  */
 export const getMessages = async (chatId: string): Promise<PreloadMessage[]> => {
-  await simulateLatency();
+  
   // In a real scenario, you would fetch messages for the given chatId from the main process
   // For now, we'll return an empty array or a mock if needed.
   return [];
@@ -91,7 +91,7 @@ export const sendCoPilotMessage = async (prompt: string): Promise<{ type: 'text'
  * Mocks creating a task.
  */
 export const createTask = async (taskDetails: string): Promise<string> => {
-  await simulateLatency();
+  
   console.log('Mock: Creating task:', taskDetails);
   return `Task "${taskDetails}" created successfully.`;
 };
@@ -100,7 +100,7 @@ export const createTask = async (taskDetails: string): Promise<string> => {
  * Mocks scheduling a message.
  */
 export const scheduleMessage = async (chatId: string, message: string, time: string): Promise<string> => {
-  await simulateLatency();
+  
   console.log('Mock: Scheduling message:', { chatId, message, time });
   return `Message "${message}" scheduled for ${time} in chat ${chatId}.`;
 };
@@ -109,7 +109,7 @@ export const scheduleMessage = async (chatId: string, message: string, time: str
  * Mocks creating a calendar event.
  */
 export const createCalendarEvent = async (title: string, date: string, attendees: string[]): Promise<string> => {
-  await simulateLatency();
+  
   console.log('Mock: Creating calendar event:', { title, date, attendees });
   return `Calendar event "${title}" created for ${date} with attendees ${attendees.join(', ')}.`;
 };
