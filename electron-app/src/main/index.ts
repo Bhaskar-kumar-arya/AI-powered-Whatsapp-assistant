@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { initializeWhatsappClient, getAllChats, getChatPictureUrl } from './whatsappClient'
+import { initializeWhatsappClient, getChatPictureUrl, getChatsForUI } from './whatsappClient'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -67,16 +67,6 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 
-  // Handle IPC call to get chats
-  ipcMain.handle('whatsapp-get-chats', async () => {
-    try {
-      const chats = await getAllChats()
-      return chats
-    } catch (error) {
-      console.error('Error getting chats:', error)
-      return []
-    }
-  })
 
   // Handle IPC call to get chat picture URL
   ipcMain.handle('whatsapp-get-chat-picture-url', async (_event, chatId: string) => {
@@ -86,6 +76,17 @@ app.whenReady().then(() => {
     } catch (error) {
       console.error(`Error getting chat picture URL for ${chatId}:`, error)
       return undefined
+    }
+  })
+
+  // Handle IPC call to get chats for UI
+  ipcMain.handle('whatsapp-get-chats-for-ui', async () => {
+    try {
+      const chats = await getChatsForUI()
+      return chats
+    } catch (error) {
+      console.error('Error getting chats for UI:', error)
+      return []
     }
   })
 })

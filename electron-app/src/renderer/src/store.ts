@@ -12,11 +12,23 @@ export interface Message {
 export interface Chat {
   id: string;
   name: string;
-  avatar: string;
-  messages: Message[];
+  isGroup: boolean;
   unreadCount: number;
+  timestamp: number;
+  lastMessage: {
+    id: string;
+    body: string;
+    timestamp: number;
+    fromMe: boolean;
+    hasMedia: boolean;
+    hasQuotedMsg: boolean;
+  } | null;
+  profilePicUrl: string | undefined;
+  isMuted: boolean;
+  pinned: boolean;
+  archived: boolean;
+  messages: Message[]; // Keep messages for conversation view
   aiActivity?: 'draft' | 'task-pending';
-  isGroup?: boolean; // Add isGroup property
 }
 
 interface AppState {
@@ -33,7 +45,6 @@ interface AppState {
   setAiSummary: (summary: string | null) => void; // New action to set AI summary
   setChats: (chats: Chat[]) => void; // New action to set chats
   fetchChats: () => Promise<void>; // New action to fetch chats
-  fetchMoreAvatars: (chatIds: string[]) => Promise<void>; // New action to fetch more avatars
 }
 
 const useStore = create<AppState>((set) => ({
@@ -89,18 +100,14 @@ const useStore = create<AppState>((set) => ({
   setAiSummary: (summary: string | null) => set(() => ({ aiSummary: summary })),
   setChats: (chats: Chat[]) => set(() => ({ chats })), // New action to set chats
   fetchChats: async () => {
-    const { getChats } = await import('./api');
-    const chats = await getChats();
-    set(() => ({ chats }));
-  },
-  fetchMoreAvatars: async (chatIds: string[]) => {
-    const { fetchMoreChatAvatars } = await import('./api');
-    const avatars = await fetchMoreChatAvatars(chatIds);
-    set((state) => ({
-      chats: state.chats.map((chat) =>
-        avatars[chat.id] ? { ...chat, avatar: avatars[chat.id] } : chat
-      ),
+    const { getChatsForUI } = await import('./api');
+    const fetchedChats = await getChatsForUI();
+    const chatsWithMessages = fetchedChats.map(chat => ({
+      ...chat,
+      messages: [], // Initialize with empty messages array
+      aiActivity: undefined // Initialize aiActivity as undefined
     }));
+    set(() => ({ chats: chatsWithMessages }));
   },
 }));
 

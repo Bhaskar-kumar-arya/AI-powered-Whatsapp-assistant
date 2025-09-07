@@ -1,18 +1,13 @@
 import React, { useEffect } from 'react';
 import ChatListItem from './ChatListItem';
 import useStore from '../store';
-import { getChats } from '../api';
 
 const Pane1_ChatList: React.FC = () => {
-  const { chats, setActiveChat, addMessage } = useStore(); // Add addMessage to destructuring
+  const { chats, setActiveChat, fetchChats } = useStore();
 
   useEffect(() => {
-    const fetchChats = async () => {
-      const fetchedChats = await getChats();
-      useStore.setState({ chats: fetchedChats });
-    };
     fetchChats();
-  }, []);
+  }, [fetchChats]);
 
   return (
     <div className="pane1-chatlist">

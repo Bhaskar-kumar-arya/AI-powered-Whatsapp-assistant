@@ -80,6 +80,7 @@
 
 .chat-info {
   flex-grow: 1;
+  min-width: 0; /* Allow content to shrink and ellipsis to work */
 }
 
 .chat-name {
@@ -89,6 +90,9 @@
 .chat-last-message {
   color: var(--text-secondary);
   font-size: 0.9em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .chat-meta {

@@ -7,17 +7,17 @@ interface ChatListItemProps {
 
 const ChatListItem: React.FC<ChatListItemProps> = ({ chat }) => {
   const activeChatId = useStore((state) => state.activeChatId);
-  const lastMessage = chat.messages.length > 0 ? chat.messages[chat.messages.length - 1] : null;
+  const { lastMessage } = chat;
 
   return (
     <div className={`chat-list-item ${chat.id === activeChatId ? 'active' : ''}`}>
-      <img src={chat.avatar} alt={`${chat.name}'s avatar`} className="chat-avatar" />
+      <img src={chat.profilePicUrl} alt={`${chat.name}'s avatar`} className="chat-avatar" />
       <div className="chat-info">
         <div className="chat-name">{chat.name}</div>
-        {lastMessage && <div className="chat-last-message">{lastMessage.text}</div>}
+        {lastMessage && <div className="chat-last-message">{lastMessage.body}</div>}
       </div>
       <div className="chat-meta">
-        {lastMessage && <div className="chat-timestamp">{lastMessage.timestamp}</div>}
+        {lastMessage && <div className="chat-timestamp">{new Date(lastMessage.timestamp * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>}
         {chat.unreadCount > 0 && <div className="chat-unread-count">{chat.unreadCount}</div>}
         {chat.aiActivity && <div className="ai-indicator">✨</div>}
       </div>

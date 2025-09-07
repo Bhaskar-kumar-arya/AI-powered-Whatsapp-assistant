@@ -57,12 +57,44 @@ export function getWhatsappClient(): Client | null {
   return client
 }
 
-export async function getAllChats() {
+export async function getChatsForUI() {
   await clientReadyPromise // Wait for the client to be ready
   if (!client) {
     throw new Error('Whatsapp client not initialized.')
   }
-  return await client.getChats()
+
+  const chats = await client.getChats()
+  const sortedChats = chats.sort((a, b) => b.timestamp - a.timestamp) // Sort by most recent activity
+  const top25Chats = sortedChats.slice(0, 25)
+
+  const chatsWithMetadata = await Promise.all(
+    top25Chats.map(async (chat) => {
+      const contact = await chat.getContact()
+      const profilePicUrl = await contact.getProfilePicUrl()
+      const lastMessage = chat.lastMessage ? {
+        id: chat.lastMessage.id._serialized,
+        body: chat.lastMessage.body,
+        timestamp: chat.lastMessage.timestamp,
+        fromMe: chat.lastMessage.fromMe,
+        hasMedia: chat.lastMessage.hasMedia,
+        hasQuotedMsg: chat.lastMessage.hasQuotedMsg
+      } : null
+
+      return {
+        id: chat.id._serialized,
+        name: chat.name,
+        isGroup: chat.isGroup,
+        unreadCount: chat.unreadCount,
+        timestamp: chat.timestamp,
+        lastMessage: lastMessage,
+        profilePicUrl: profilePicUrl,
+        isMuted: chat.isMuted,
+        pinned: chat.pinned,
+        archived: chat.archived
+      }
+    })
+  )
+  return chatsWithMetadata
 }
 
 export async function getChatPictureUrl(chatId: string): Promise<string | undefined> {

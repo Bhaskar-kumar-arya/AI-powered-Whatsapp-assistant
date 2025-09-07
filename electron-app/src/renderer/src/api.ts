@@ -1,6 +1,27 @@
 // src/renderer/api.ts
 
-import { Chat, Message } from './store'; // Assuming Chat and Message types are defined in store.ts
+import { Message } from './store'; // Assuming Message type is defined in store.ts
+
+// Define the structure for Chat objects with additional metadata
+export interface Chat {
+  id: string;
+  name: string;
+  isGroup: boolean;
+  unreadCount: number;
+  timestamp: number;
+  lastMessage: {
+    id: string;
+    body: string;
+    timestamp: number;
+    fromMe: boolean;
+    hasMedia: boolean;
+    hasQuotedMsg: boolean;
+  } | null;
+  profilePicUrl: string | undefined;
+  isMuted: boolean;
+  pinned: boolean;
+  archived: boolean;
+}
 
 // Utility to simulate network latency
 const simulateLatency = (ms: number = 500) => new Promise(resolve => setTimeout(resolve, ms));
@@ -15,31 +36,13 @@ const mockAiSummaries: { [chatId: string]: string } = {
 /**
  * Fetches a list of chats from the main process.
  */
-export const getChats = async (): Promise<Chat[]> => {
+/**
+ * Fetches a list of chats for the UI, including detailed metadata, from the main process.
+ */
+export const getChatsForUI = async (): Promise<Chat[]> => {
   await simulateLatency(); // Keep for consistent UX, remove if not needed
-  const whatsappChats = await window.api.whatsapp.getAllChats();
-
-  // Sort chats by timestamp in descending order (most recent first)
-  whatsappChats.sort((a: any, b: any) => b.timestamp - a.timestamp);
-
-  // Map whatsapp-web.js Chat objects to your Chat interface
-  const chats = await Promise.all(
-    whatsappChats.map(async (chat: any, index: number) => {
-      let avatar;
-      if (index < 25) { // Fetch avatars for the first 25 chats
-        avatar = await window.api.whatsapp.getChatPictureUrl(chat.id._serialized);
-      }
-      return {
-        id: chat.id._serialized, // Use _serialized as a unique ID
-        name: chat.name || chat.id._serialized, // Use chat name or ID
-        avatar: avatar, // No placeholder avatar
-        messages: [], // Messages will be fetched separately
-        unreadCount: chat.unreadCount || 0,
-        isGroup: chat.isGroup,
-      };
-    })
-  );
-  return chats;
+  const chatsWithMetadata = await window.api.whatsapp.getChatsForUI();
+  return chatsWithMetadata;
 };
 
 export const fetchMoreChatAvatars = async (chatIds: string[]): Promise<{ [chatId: string]: string }> => {
