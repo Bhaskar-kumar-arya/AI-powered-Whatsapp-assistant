@@ -33,11 +33,23 @@ const useStore = create<AppState>((set) => ({
   theme: 'light', // Default theme
   aiSummary: null, // Initial state for AI summary
 
-  setActiveChat: (id: string) => set(() => ({ activeChatId: id })),
+  setActiveChat: (id: string) =>
+    set((state) => {
+      // Mark the previously active chat as read if it exists
+      if (state.activeChatId) {
+        const prevActiveChat = state.chats.find(chat => chat.id === state.activeChatId);
+        if (prevActiveChat) {
+          state.markChatAsRead(prevActiveChat.id);
+        }
+      }
+      // Mark the newly active chat as read
+      state.markChatAsRead(id);
+      return { activeChatId: id };
+    }),
   markChatAsRead: (id: string) =>
     set((state) => {
-      const chatToMark = state.chats.find(chat => chat.id === id);
-      if (chatToMark && chatToMark.unreadCount > 0) {
+      const chatToMark = state.chats.find((chat) => chat.id === id);
+      if (chatToMark && chatToMark.unreadCount && chatToMark.unreadCount > 0) {
         return {
           chats: state.chats.map((chat) =>
             chat.id === id ? { ...chat, unreadCount: 0 } : chat
@@ -65,16 +77,20 @@ const useStore = create<AppState>((set) => ({
     })),
   addMessage: (chatId: string, message: Message) =>
     set((state) => {
-      const updatedChats = state.chats.map((chat) =>
-        chat.id === chatId
-          ? {
-              ...chat,
-              messages: [...chat.messages, message],
-              lastMessage: message, // Update lastMessage with the new message
-              timestamp: message.timestamp, // Update chat timestamp for sorting
-            }
-          : chat
-      );
+      const updatedChats = state.chats.map((chat) => {
+        if (chat.id === chatId) {
+          const isCurrentChatActive = state.activeChatId === chatId;
+          const newUnreadCount = isCurrentChatActive ? 0 : (chat.unreadCount || 0) + 1;
+          return {
+            ...chat,
+            messages: [...chat.messages, message],
+            lastMessage: message, // Update lastMessage with the new message
+            timestamp: message.timestamp, // Update chat timestamp for sorting
+            unreadCount: newUnreadCount, // Increment unread count if not active
+          };
+        }
+        return chat;
+      });
 
       // Re-sort chats to place the one with the latest message at the top
       const sortedChats = updatedChats.sort((a, b) => {

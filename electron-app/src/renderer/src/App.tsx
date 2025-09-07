@@ -4,11 +4,13 @@ import MainLayout from './components/MainLayout'
 import Pane1_ChatList from './components/Pane1_ChatList'
 import Pane2_Conversation from './components/Pane2_Conversation'
 import Pane3_AIPanel from './components/Pane3_AIPanel'
+import useStore, { Message } from './store'
 
 function App() {
   const [theme] = useState<'light' | 'dark'>('dark') // Default to dark mode
   const [qrCode, setQrCode] = useState<string | null>(null)
   const [isWhatsappReady, setIsWhatsappReady] = useState(false)
+  const addMessage = useStore((state) => state.addMessage)
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -53,7 +55,16 @@ function App() {
       // or ensure that the main process handles listener cleanup.
       // For this example, we'll rely on the main process to manage its listeners.
     }
-  }, [])
+
+    window.api.whatsapp.on('new-message', (chatId: string, message: Message) => {
+      console.log('New message received in renderer:', chatId, message)
+      addMessage(chatId, message)
+    })
+
+    return () => {
+      // Consider implementing a cleanup mechanism if necessary
+    }
+  }, [addMessage])
 
   if (!isWhatsappReady && qrCode) {
     return (

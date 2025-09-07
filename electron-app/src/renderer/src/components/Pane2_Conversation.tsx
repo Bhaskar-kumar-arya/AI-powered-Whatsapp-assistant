@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import ChatHeader from './ChatHeader';
 import MessageBubble from './MessageBubble';
 import MessageInputBox from './MessageInputBox';
@@ -9,6 +9,7 @@ import { Chat, Message } from '../store'; // Import Chat and Message interfaces 
 const Pane2_Conversation: React.FC = () => {
   const { chats, activeChatId, addMessage, setActiveChat, markChatAsRead } = useStore();
   const activeChat = chats.find((chat: Chat) => chat.id === activeChatId); // Type activeChat
+  const messageListRef = useRef<HTMLDivElement>(null);
 
   // Effect for fetching messages
   useEffect(() => {
@@ -74,10 +75,16 @@ const Pane2_Conversation: React.FC = () => {
     }
   }, [activeChatId, addMessage]);
 
+  useEffect(() => {
+    if (messageListRef.current) {
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
+    }
+  }, [activeChat?.messages]);
+
   return (
     <div className="pane2-conversation">
       <ChatHeader />
-      <div className="message-list">
+      <div className="message-list" ref={messageListRef}>
         {activeChat && activeChat.messages ? (
           activeChat.messages.map((message: Message) => (
             <MessageBubble key={message.id} message={message} />
