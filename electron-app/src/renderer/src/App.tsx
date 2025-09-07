@@ -1,17 +1,76 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
-import MainLayout from './components/MainLayout';
-import Pane1_ChatList from './components/Pane1_ChatList';
-import Pane2_Conversation from './components/Pane2_Conversation';
-import Pane3_AIPanel from './components/Pane3_AIPanel';
+import React, { useState, useEffect } from 'react'
+import './App.css'
+import MainLayout from './components/MainLayout'
+import Pane1_ChatList from './components/Pane1_ChatList'
+import Pane2_Conversation from './components/Pane2_Conversation'
+import Pane3_AIPanel from './components/Pane3_AIPanel'
 
 function App() {
-  const [theme] = useState<'light' | 'dark'>('dark'); // Default to dark mode
+  const [theme] = useState<'light' | 'dark'>('dark') // Default to dark mode
+  const [qrCode, setQrCode] = useState<string | null>(null)
+  const [isWhatsappReady, setIsWhatsappReady] = useState(false)
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    // No need to save to localStorage if we always default to dark
-  }, [theme]);
+    document.documentElement.setAttribute('data-theme', theme)
+  }, [theme])
+
+  useEffect(() => {
+    window.api.whatsapp.on('qr-code', (qrCodeDataUrl: string) => {
+      console.log('QR Code received in renderer:', qrCodeDataUrl)
+      setQrCode(qrCodeDataUrl)
+    })
+
+    window.api.whatsapp.on('whatsapp-ready', () => {
+      console.log('WhatsApp client is ready!')
+      setIsWhatsappReady(true)
+      setQrCode(null) // Clear QR code once ready
+    })
+
+    window.api.whatsapp.on('whatsapp-authenticated', () => {
+      console.log('WhatsApp client authenticated!')
+      setIsWhatsappReady(true)
+      setQrCode(null) // Clear QR code once authenticated
+    })
+
+    window.api.whatsapp.on('whatsapp-auth-failure', (msg: string) => {
+      console.error('WhatsApp authentication failed:', msg)
+      setIsWhatsappReady(false)
+      setQrCode(null) // Clear QR code on auth failure
+      // Optionally, trigger a re-initialization or show an error message
+    })
+
+    window.api.whatsapp.on('whatsapp-disconnected', (reason: string) => {
+      console.log('WhatsApp client disconnected:', reason)
+      setIsWhatsappReady(false)
+      setQrCode(null) // Clear QR code on disconnect
+      // Optionally, trigger a re-initialization or show QR again
+    })
+
+    // Cleanup listeners on component unmount
+    return () => {
+      // Note: ipcRenderer.removeListener is not directly exposed via contextBridge.
+      // For a more robust solution, you might need to expose a way to remove listeners
+      // or ensure that the main process handles listener cleanup.
+      // For this example, we'll rely on the main process to manage its listeners.
+    }
+  }, [])
+
+  if (!isWhatsappReady && qrCode) {
+    return (
+      <div className="qr-code-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
+        <h1>Scan this QR code with your WhatsApp app</h1>
+        <img src={qrCode} alt="WhatsApp QR Code" style={{ width: '300px', height: '300px' }} />
+      </div>
+    )
+  }
+
+  if (!isWhatsappReady && !qrCode) {
+    return (
+      <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <h1>Initializing WhatsApp...</h1>
+      </div>
+    )
+  }
 
   return (
     <div className="app-container">
@@ -21,7 +80,7 @@ function App() {
         <Pane3_AIPanel />
       </MainLayout>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
