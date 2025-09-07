@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Message } from '../store';
 import { downloadMedia } from '../api';
 
@@ -10,10 +10,12 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   const { body, fromMe, timestamp, status, hasMedia, mediaMimeType, id } = message;
   const senderClass = fromMe ? 'me' : 'other';
   const [showAiIcon, setShowAiIcon] = useState(false);
-  const [downloadedMediaUrl, setDownloadedMediaUrl] = useState<string | undefined>(message.mediaUrl);
+  const [downloadedMediaBlobUrl, setDownloadedMediaBlobUrl] = useState<string | undefined>(undefined); // This will store the object URL
   const [downloadedMediaMimeType, setDownloadedMediaMimeType] = useState<string | undefined>(message.mediaMimeType);
 
-  console.log('MessageBubble:', { id, hasMedia, mediaMimeType, downloadedMediaUrl, body });
+  // No longer need to create object URL in renderer, main process provides data URL directly
+
+  console.log('MessageBubble:', { id, hasMedia, mediaMimeType, downloadedMediaBlobUrl, body });
 
   const renderStatusTicks = () => {
     if (fromMe) {
@@ -39,7 +41,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
     if (id) {
       const mediaData = await downloadMedia(id);
       if (mediaData) {
-        setDownloadedMediaUrl(mediaData.mediaUrl);
+        setDownloadedMediaBlobUrl(mediaData.mediaBlobUrl);
         setDownloadedMediaMimeType(mediaData.mediaMimeType);
       }
     }
@@ -50,18 +52,27 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
       return <p className="message-text">{body}</p>;
     }
 
-    if (downloadedMediaUrl) {
-      console.log('Displaying media:', { downloadedMediaUrl, downloadedMediaMimeType });
+    if (downloadedMediaBlobUrl) {
+      console.log('MessageBubble: Attempting to display media with Blob URL:', { downloadedMediaBlobUrl, downloadedMediaMimeType });
       if (downloadedMediaMimeType?.startsWith('image')) {
-        return <img src={downloadedMediaUrl} alt="media" className="message-media-image" />;
+        return <img src={downloadedMediaBlobUrl} alt="media" className="message-media-image" />;
       } else if (downloadedMediaMimeType?.startsWith('video')) {
+        console.log('MessageBubble: Rendering video tag with Blob URL src:', downloadedMediaBlobUrl);
         return (
-          <video controls src={downloadedMediaUrl} className="message-media-video">
+          <video controls src={downloadedMediaBlobUrl} className="message-media-video">
             Your browser does not support the video tag.
           </video>
         );
-      } else {
+      } else if (downloadedMediaMimeType) {
+        console.log('MessageBubble: Unknown media type, displaying as attachment:', downloadedMediaMimeType);
         return <p className="message-text">Attachment: {downloadedMediaMimeType}</p>;
+      } else {
+        return (
+          <div className="media-placeholder">
+            <p>Media available</p>
+            <button onClick={handleDownloadMedia}>Download</button>
+          </div>
+        );
       }
     } else if (hasMedia) { // Only show placeholder if hasMedia is true and not yet downloaded
       console.log('Displaying media placeholder for:', { id, downloadedMediaMimeType });

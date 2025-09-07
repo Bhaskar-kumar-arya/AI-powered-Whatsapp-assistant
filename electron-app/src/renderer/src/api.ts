@@ -42,8 +42,13 @@ export const fetchMoreChatAvatars = async (chatIds: string[]): Promise<{ [chatId
   return avatars;
 };
 
-export const downloadMedia = async (messageId: string): Promise<{ mediaUrl: string; mediaMimeType: string } | undefined> => {
-  return await window.api.whatsapp.downloadMedia(messageId);
+export const downloadMedia = async (messageId: string): Promise<{ mediaBlobUrl: string; mediaMimeType: string } | undefined> => {
+  const mediaData = await window.api.whatsapp.downloadMedia(messageId);
+  if (mediaData && mediaData.mediaUrl) {
+    // The main process now returns a data URL directly
+    return { mediaBlobUrl: mediaData.mediaUrl, mediaMimeType: mediaData.mediaMimeType };
+  }
+  return undefined;
 };
 
 /**

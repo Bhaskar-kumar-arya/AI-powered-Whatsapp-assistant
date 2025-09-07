@@ -49,14 +49,17 @@ function createWindow(): void {
 app.whenReady().then(() => {
   // Register a custom protocol to serve media files
   protocol.handle('whatsapp-media', async (request) => {
-    const mediaPath = path.join(app.getPath('userData'), 'media', request.url.replace('whatsapp-media://', ''))
+    const mediaFileName = request.url.replace('whatsapp-media://', '');
+    const mediaPath = path.join(app.getPath('userData'), 'media', mediaFileName);
+    console.log(`[Main Process] Custom protocol handler: Request for ${request.url}, mapping to local path: ${mediaPath}`);
     try {
-      const data = await fs.promises.readFile(mediaPath)
-      const mimeType = mime.getType(mediaPath) || 'application/octet-stream'
-      return new Response(new Blob([new Uint8Array(data)], { type: mimeType }))
+      const data = await fs.promises.readFile(mediaPath);
+      const mimeType = mime.getType(mediaPath) || 'application/octet-stream';
+      console.log(`[Main Process] Custom protocol handler: Successfully read file ${mediaPath}, MIME type: ${mimeType}`);
+      return new Response(new Blob([new Uint8Array(data)], { type: mimeType }));
     } catch (error) {
-      console.error('Failed to serve media file:', error)
-      return new Response('File not found', { status: 404 })
+      console.error(`[Main Process] Custom protocol handler: Failed to serve media file ${mediaPath}:`, error);
+      return new Response('File not found', { status: 404 });
     }
   })
 

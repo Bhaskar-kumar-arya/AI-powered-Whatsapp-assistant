@@ -3,6 +3,7 @@ import { Client, LocalAuth, MessageMedia } from 'whatsapp-web.js'
 import qrcode from 'qrcode'
 import fs from 'fs'
 import path from 'path'
+import mime from 'mime'
 
 const mediaDir = path.join(app.getPath('userData'), 'media')
 if (!fs.existsSync(mediaDir)) {
@@ -117,7 +118,7 @@ export async function getChatsForUI(): Promise<Chat[]> {
         hasMedia: msg.hasMedia,
         hasQuotedMsg: msg.hasQuotedMsg,
         mediaUrl: undefined,
-        mediaMimeType: undefined
+        mediaMimeType: msg.hasMedia ? msg.type : undefined
       }))
 
       const lastMessage = chat.lastMessage ? {
@@ -159,10 +160,15 @@ export async function downloadMedia(messageId: string): Promise<{ mediaUrl: stri
     if (message && message.hasMedia) {
       const media = await message.downloadMedia()
       if (media) {
-        const mediaPath = path.join(mediaDir, `${message.id.id}`)
-        const buffer = Buffer.from(media.data, 'base64')
-        fs.writeFileSync(mediaPath, buffer)
-        return { mediaUrl: `whatsapp-media://${message.id.id}`, mediaMimeType: media.mimetype }
+        const fileExtension = mime.getExtension(media.mimetype);
+        const mediaFileName = `${message.id.id}.${fileExtension}`;
+        const mediaPath = path.join(mediaDir, mediaFileName);
+        const buffer = Buffer.from(media.data, 'base64');
+        fs.writeFileSync(mediaPath, buffer);
+        console.log(`[Main Process] downloadMedia: Media saved to ${mediaPath} with MIME type ${media.mimetype}`);
+        const dataUrl = `data:${media.mimetype};base64,${media.data}`;
+        console.log(`[Main Process] downloadMedia: Returning dataUrl (truncated): ${dataUrl.substring(0, 100)}..., mediaMimeType: ${media.mimetype}`);
+        return { mediaUrl: dataUrl, mediaMimeType: media.mimetype };
       }
     }
   } catch (error) {
