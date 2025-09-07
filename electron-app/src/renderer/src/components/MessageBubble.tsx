@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Message } from '../store';
+import React, { useState } from 'react'; // useEffect is no longer needed here
+import useStore, { Message } from '../store'; // Import useStore
 import { downloadMedia } from '../api';
 
 interface MessageBubbleProps {
@@ -10,10 +10,9 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   const { body, fromMe, timestamp, status, hasMedia, mediaMimeType, id } = message;
   const senderClass = fromMe ? 'me' : 'other';
   const [showAiIcon, setShowAiIcon] = useState(false);
-  const [downloadedMediaBlobUrl, setDownloadedMediaBlobUrl] = useState<string | undefined>(undefined); // This will store the object URL
+  const updateMessageMediaBlobUrl = useStore((state) => state.updateMessageMediaBlobUrl); // Get the action from the store
+  const [downloadedMediaBlobUrl, setDownloadedMediaBlobUrl] = useState<string | undefined>(message.mediaBlobUrl); // Initialize from store
   const [downloadedMediaMimeType, setDownloadedMediaMimeType] = useState<string | undefined>(message.mediaMimeType);
-
-  // No longer need to create object URL in renderer, main process provides data URL directly
 
   console.log('MessageBubble:', { id, hasMedia, mediaMimeType, downloadedMediaBlobUrl, body });
 
@@ -43,6 +42,8 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
       if (mediaData) {
         setDownloadedMediaBlobUrl(mediaData.mediaBlobUrl);
         setDownloadedMediaMimeType(mediaData.mediaMimeType);
+        // Update the message in the store with the downloaded mediaBlobUrl
+        updateMessageMediaBlobUrl(message.chatId!, message.id!, mediaData.mediaBlobUrl);
       }
     }
   };

@@ -4,8 +4,9 @@ import { Chat as PreloadChat, Message as PreloadMessage } from '../../preload/in
 // Define types for your data, extending the preload types with UI-specific properties
 export interface Message extends PreloadMessage {
   status?: 'pending' | 'sent' | 'delivered' | 'read' | 'failed'; // Crucial for ticks, now optional and includes pending/failed
-  mediaUrl?: string;
+  mediaUrl?: string; // This will now hold the data URL
   mediaMimeType?: string;
+  mediaBlobUrl?: string; // To store the object URL for display
 }
 
 export interface Chat extends PreloadChat {
@@ -23,6 +24,7 @@ interface AppState {
   setActiveChat: (id: string) => void;
   markChatAsRead: (id: string) => void;
   updateMessageStatus: (chatId: string, messageId: string, status: 'sent' | 'delivered' | 'read' | 'failed') => void;
+  updateMessageMediaBlobUrl: (chatId: string, messageId: string, mediaBlobUrl: string) => void; // New action to update mediaBlobUrl
   toggleTheme: () => void;
   addMessage: (chatId: string, message: Message) => void; // Modified to accept a full Message object
   setAiSummary: (summary: string | null) => void; // New action to set AI summary
@@ -74,6 +76,19 @@ const useStore = create<AppState>((set) => ({
           : chat
       ),
     })),
+  updateMessageMediaBlobUrl: (chatId: string, messageId: string, mediaBlobUrl: string) =>
+    set((state) => ({
+      chats: state.chats.map((chat) =>
+        chat.id === chatId
+          ? {
+              ...chat,
+              messages: chat.messages.map((message) =>
+                message.id === messageId ? { ...message, mediaBlobUrl } : message
+              ),
+            }
+          : chat
+      ),
+    })),
   toggleTheme: () =>
     set((state) => ({
       theme: state.theme === 'light' ? 'dark' : 'light',
@@ -86,8 +101,8 @@ const useStore = create<AppState>((set) => ({
           const newUnreadCount = isCurrentChatActive ? 0 : (chat.unreadCount || 0) + 1;
           return {
             ...chat,
-            messages: [...chat.messages, message],
-            lastMessage: message, // Update lastMessage with the new message
+            messages: [...chat.messages, { ...message, mediaBlobUrl: message.mediaUrl }], // Store data URL as mediaBlobUrl
+            lastMessage: { ...message, mediaBlobUrl: message.mediaUrl }, // Update lastMessage with the new message and its mediaBlobUrl
             timestamp: message.timestamp, // Update chat timestamp for sorting
             unreadCount: newUnreadCount, // Increment unread count if not active
           };
@@ -111,7 +126,7 @@ const useStore = create<AppState>((set) => ({
     const fetchedChats: PreloadChat[] = await getChatsForUI();
     const chatsWithUiState: Chat[] = fetchedChats.map(chat => ({
       ...chat,
-      messages: chat.messages ? chat.messages.map(msg => ({ ...msg, status: 'read' })) : [], // Initialize status for existing messages, handle undefined messages
+      messages: chat.messages ? chat.messages.map(msg => ({ ...msg, status: 'read', mediaBlobUrl: msg.mediaUrl })) : [], // Store data URL as mediaBlobUrl for existing messages
       aiActivity: undefined // Initialize aiActivity as undefined
     }));
     set(() => ({ chats: chatsWithUiState }));

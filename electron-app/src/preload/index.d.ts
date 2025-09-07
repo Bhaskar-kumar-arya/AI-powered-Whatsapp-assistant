@@ -17,6 +17,7 @@ declare global {
 
   export interface Message {
     id: string;
+    chatId: string; // Add chatId to Message interface
     body: string;
     timestamp: number;
     fromMe: boolean;

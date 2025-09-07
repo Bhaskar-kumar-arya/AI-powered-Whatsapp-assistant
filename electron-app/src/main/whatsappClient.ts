@@ -66,6 +66,7 @@ export function initializeWhatsappClient(mainWindow: BrowserWindow): void {
 
     const mappedMessage: Message = {
       id: msg.id._serialized,
+      chatId: chat.id._serialized, // Add chatId
       body: msg.body,
       timestamp: msg.timestamp,
       fromMe: msg.fromMe,
@@ -112,6 +113,7 @@ export async function getChatsForUI(): Promise<Chat[]> {
 
       const mappedMessages: Message[] = messages.map((msg) => ({
         id: msg.id._serialized,
+        chatId: chat.id._serialized, // Add chatId
         body: msg.body,
         timestamp: msg.timestamp,
         fromMe: msg.fromMe,
@@ -123,6 +125,7 @@ export async function getChatsForUI(): Promise<Chat[]> {
 
       const lastMessage = chat.lastMessage ? {
         id: chat.lastMessage.id._serialized,
+        chatId: chat.id._serialized, // Add chatId
         body: chat.lastMessage.body,
         timestamp: chat.lastMessage.timestamp,
         fromMe: chat.lastMessage.fromMe,
