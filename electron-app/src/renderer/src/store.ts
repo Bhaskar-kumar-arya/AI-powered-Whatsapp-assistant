@@ -1,33 +1,13 @@
 import { create } from 'zustand';
+import { Chat as PreloadChat, Message as PreloadMessage } from '../../preload/index.d';
 
-// Define types for your data
-export interface Message {
-  id: string;
-  text: string;
-  timestamp: string;
-  sender: 'me' | 'other';
+// Define types for your data, extending the preload types with UI-specific properties
+export interface Message extends PreloadMessage {
   status: 'sent' | 'delivered' | 'read'; // Crucial for ticks
 }
 
-export interface Chat {
-  id: string;
-  name: string;
-  isGroup: boolean;
-  unreadCount: number;
-  timestamp: number;
-  lastMessage: {
-    id: string;
-    body: string;
-    timestamp: number;
-    fromMe: boolean;
-    hasMedia: boolean;
-    hasQuotedMsg: boolean;
-  } | null;
-  profilePicUrl: string | undefined;
-  isMuted: boolean;
-  pinned: boolean;
-  archived: boolean;
-  messages: Message[]; // Keep messages for conversation view
+export interface Chat extends PreloadChat {
+  messages: Message[]; // Override messages to use the extended Message type
   aiActivity?: 'draft' | 'task-pending';
 }
 
@@ -41,7 +21,7 @@ interface AppState {
   markChatAsRead: (id: string) => void;
   updateMessageStatus: (chatId: string, messageId: string, status: 'delivered' | 'read') => void;
   toggleTheme: () => void;
-  addMessage: (chatId: string, text: string, sender: 'me' | 'other') => void;
+  addMessage: (chatId: string, text: string, fromMe: boolean) => void;
   setAiSummary: (summary: string | null) => void; // New action to set AI summary
   setChats: (chats: Chat[]) => void; // New action to set chats
   fetchChats: () => Promise<void>; // New action to fetch chats
@@ -77,7 +57,7 @@ const useStore = create<AppState>((set) => ({
     set((state) => ({
       theme: state.theme === 'light' ? 'dark' : 'light',
     })),
-  addMessage: (chatId: string, text: string, sender: 'me' | 'other') =>
+  addMessage: (chatId: string, text: string, fromMe: boolean) =>
     set((state) => ({
       chats: state.chats.map((chat) =>
         chat.id === chatId
@@ -87,10 +67,12 @@ const useStore = create<AppState>((set) => ({
                 ...chat.messages,
                 {
                   id: `msg-${chatId}-${chat.messages.length + 1}`,
-                  text,
-                  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                  sender,
-                  status: sender === 'me' ? 'sent' : 'read', // Default status for new messages
+                  body: text,
+                  timestamp: Date.now(),
+                  fromMe,
+                  hasMedia: false,
+                  hasQuotedMsg: false,
+                  status: fromMe ? 'sent' : 'read', // Default status for new messages
                 },
               ],
             }
@@ -101,13 +83,13 @@ const useStore = create<AppState>((set) => ({
   setChats: (chats: Chat[]) => set(() => ({ chats })), // New action to set chats
   fetchChats: async () => {
     const { getChatsForUI } = await import('./api');
-    const fetchedChats = await getChatsForUI();
-    const chatsWithMessages = fetchedChats.map(chat => ({
+    const fetchedChats: PreloadChat[] = await getChatsForUI();
+    const chatsWithUiState: Chat[] = fetchedChats.map(chat => ({
       ...chat,
-      messages: [], // Initialize with empty messages array
+      messages: chat.messages ? chat.messages.map(msg => ({ ...msg, status: 'read' })) : [], // Initialize status for existing messages, handle undefined messages
       aiActivity: undefined // Initialize aiActivity as undefined
     }));
-    set(() => ({ chats: chatsWithMessages }));
+    set(() => ({ chats: chatsWithUiState }));
   },
 }));
 

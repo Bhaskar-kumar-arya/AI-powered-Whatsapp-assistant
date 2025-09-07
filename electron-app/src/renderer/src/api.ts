@@ -1,27 +1,6 @@
 // src/renderer/api.ts
 
-import { Message } from './store'; // Assuming Message type is defined in store.ts
-
-// Define the structure for Chat objects with additional metadata
-export interface Chat {
-  id: string;
-  name: string;
-  isGroup: boolean;
-  unreadCount: number;
-  timestamp: number;
-  lastMessage: {
-    id: string;
-    body: string;
-    timestamp: number;
-    fromMe: boolean;
-    hasMedia: boolean;
-    hasQuotedMsg: boolean;
-  } | null;
-  profilePicUrl: string | undefined;
-  isMuted: boolean;
-  pinned: boolean;
-  archived: boolean;
-}
+import { Chat as PreloadChat, Message as PreloadMessage } from '../../preload/index.d';
 
 // Utility to simulate network latency
 const simulateLatency = (ms: number = 500) => new Promise(resolve => setTimeout(resolve, ms));
@@ -34,12 +13,9 @@ const mockAiSummaries: { [chatId: string]: string } = {
 };
 
 /**
- * Fetches a list of chats from the main process.
- */
-/**
  * Fetches a list of chats for the UI, including detailed metadata, from the main process.
  */
-export const getChatsForUI = async (): Promise<Chat[]> => {
+export const getChatsForUI = async (): Promise<PreloadChat[]> => {
   await simulateLatency(); // Keep for consistent UX, remove if not needed
   const chatsWithMetadata = await window.api.whatsapp.getChatsForUI();
   return chatsWithMetadata;
@@ -61,7 +37,7 @@ export const fetchMoreChatAvatars = async (chatIds: string[]): Promise<{ [chatId
 /**
  * Mocks fetching messages for a specific chat.
  */
-export const getMessages = async (chatId: string): Promise<Message[]> => {
+export const getMessages = async (chatId: string): Promise<PreloadMessage[]> => {
   await simulateLatency();
   // In a real scenario, you would fetch messages for the given chatId from the main process
   // For now, we'll return an empty array or a mock if needed.

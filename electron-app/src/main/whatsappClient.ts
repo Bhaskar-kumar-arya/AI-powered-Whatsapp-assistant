@@ -57,7 +57,9 @@ export function getWhatsappClient(): Client | null {
   return client
 }
 
-export async function getChatsForUI() {
+import { Message, Chat } from '../preload/index.d'
+
+export async function getChatsForUI(): Promise<Chat[]> {
   await clientReadyPromise // Wait for the client to be ready
   if (!client) {
     throw new Error('Whatsapp client not initialized.')
@@ -69,8 +71,19 @@ export async function getChatsForUI() {
 
   const chatsWithMetadata = await Promise.all(
     top25Chats.map(async (chat) => {
+      const messages = await chat.fetchMessages({ limit: 20 }) // Fetch messages for each chat
       const contact = await chat.getContact()
       const profilePicUrl = await contact.getProfilePicUrl()
+
+      const mappedMessages: Message[] = messages.map(msg => ({
+        id: msg.id._serialized,
+        body: msg.body,
+        timestamp: msg.timestamp,
+        fromMe: msg.fromMe,
+        hasMedia: msg.hasMedia,
+        hasQuotedMsg: msg.hasQuotedMsg
+      }))
+
       const lastMessage = chat.lastMessage ? {
         id: chat.lastMessage.id._serialized,
         body: chat.lastMessage.body,
@@ -90,7 +103,8 @@ export async function getChatsForUI() {
         profilePicUrl: profilePicUrl,
         isMuted: chat.isMuted,
         pinned: chat.pinned,
-        archived: chat.archived
+        archived: chat.archived,
+        messages: mappedMessages // Add messages array
       }
     })
   )

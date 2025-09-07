@@ -7,8 +7,33 @@ declare global {
       whatsapp: {
         on: (channel: string, callback: (...args: any[]) => void) => void
         getChatPictureUrl: (chatId: string) => Promise<string | undefined>
-        getChatsForUI: () => Promise<any[]>
+        getChatsForUI: () => Promise<Chat[]>
       }
     }
   }
+
+  export interface Message {
+    id: string;
+    body: string;
+    timestamp: number;
+    fromMe: boolean;
+    hasMedia: boolean;
+    hasQuotedMsg: boolean;
+  }
+
+  export interface Chat {
+    id: string;
+    name: string;
+    isGroup: boolean;
+    unreadCount: number;
+    timestamp: number;
+    lastMessage: Message | null;
+    profilePicUrl: string | undefined;
+    isMuted: boolean;
+    pinned: boolean;
+    archived: boolean;
+    messages: Message[]; // Add messages array
+  }
 }
+
+export { Message, Chat }

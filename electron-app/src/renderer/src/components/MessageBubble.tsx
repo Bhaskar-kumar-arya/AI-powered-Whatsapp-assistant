@@ -6,11 +6,12 @@ interface MessageBubbleProps {
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
-  const { text, sender, timestamp, status } = message;
+  const { body, fromMe, timestamp, status } = message;
+  const senderClass = fromMe ? 'me' : 'other';
   const [showAiIcon, setShowAiIcon] = useState(false);
 
   const renderStatusTicks = () => {
-    if (sender === 'me') {
+    if (fromMe) {
       let tickClass = 'message-status-ticks';
       if (status === 'read') {
         tickClass += ' read';
@@ -26,18 +27,18 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   };
 
   const handleAiIconClick = () => {
-    console.log('AI icon clicked for message:', text);
+    console.log('AI icon clicked for message:', body);
   };
 
   return (
     <div
-      className={`message-bubble ${sender}`}
+      className={`message-bubble ${senderClass}`}
       onMouseEnter={() => setShowAiIcon(true)}
       onMouseLeave={() => setShowAiIcon(false)}
     >
-      <p className="message-text">{text}</p>
+      <p className="message-text">{body}</p>
       <div className="message-metadata">
-        <span className="message-timestamp">{timestamp}</span>
+        <span className="message-timestamp">{new Date(timestamp * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
         {renderStatusTicks()}
       </div>
       {showAiIcon && (
