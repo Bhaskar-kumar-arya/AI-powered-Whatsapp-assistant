@@ -57,6 +57,11 @@ export function initializeWhatsappClient(mainWindow: BrowserWindow): void {
     console.log('Client was disconnected', reason)
     mainWindow.webContents.send('whatsapp-disconnected', reason)
   })
+
+  client.on('message_create', (msg) => {
+    // TODO : currently when we send a message from other device , it isnt synced with the live chat on this app... we can use this method for that 
+    console.log(msg.body)
+  })
   
   client.on('message', async (msg) => {
     console.log('New message received:', msg.body)
