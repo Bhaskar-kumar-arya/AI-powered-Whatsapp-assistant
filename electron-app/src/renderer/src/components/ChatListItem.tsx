@@ -13,7 +13,7 @@ const ChatListItem: React.FC<ChatListItemProps> = ({ chat }) => {
     <div className={`chat-list-item ${chat.id === activeChatId ? 'active' : ''}`}>
       <img src={chat.profilePicUrl} alt={`${chat.name}'s avatar`} className="chat-avatar" />
       <div className="chat-info">
-        <div className="chat-name">{chat.name}</div>
+        <div className="chat-name">{chat.contactName || chat.name || chat.id}</div>
         {lastMessage && <div className="chat-last-message">{lastMessage.body}</div>}
       </div>
       <div className="chat-meta">

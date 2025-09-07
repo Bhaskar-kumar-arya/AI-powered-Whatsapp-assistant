@@ -36,6 +36,7 @@ declare global {
     pinned: boolean;
     archived: boolean;
     messages: Message[]; // Add messages array
+    contactName?: string; // Add contactName
   }
 }
 

@@ -129,7 +129,8 @@ export async function getChatsForUI(): Promise<Chat[]> {
         isMuted: chat.isMuted,
         pinned: chat.pinned,
         archived: chat.archived,
-        messages: mappedMessages // Add messages array
+        messages: mappedMessages, // Add messages array
+        contactName: chat.isGroup ? chat.name : (contact.name || contact.pushname || chat.id._serialized)
       }
     })
   )

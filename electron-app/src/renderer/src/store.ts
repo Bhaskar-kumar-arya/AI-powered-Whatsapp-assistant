@@ -9,6 +9,7 @@ export interface Message extends PreloadMessage {
 export interface Chat extends PreloadChat {
   messages: Message[]; // Override messages to use the extended Message type
   aiActivity?: 'draft' | 'task-pending';
+  contactName?: string; // Add contactName
 }
 
 interface AppState {

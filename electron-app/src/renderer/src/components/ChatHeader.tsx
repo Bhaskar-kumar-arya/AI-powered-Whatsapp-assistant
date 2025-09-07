@@ -20,7 +20,12 @@ const ChatHeader: React.FC = () => {
 
   return (
     <div className="chat-header">
-      <h3>{activeChat?.name || 'Select a Chat'}</h3>
+      <div className="chat-header-info">
+        {activeChat?.profilePicUrl && (
+          <img src={activeChat.profilePicUrl} alt={`${activeChat.contactName || activeChat.name || activeChat.id}'s avatar`} className="chat-header-avatar" />
+        )}
+        <h3>{activeChat?.contactName || activeChat?.name || 'Select a Chat'}</h3>
+      </div>
       <button className="summarize-button" onClick={handleSummarizeChat} disabled={!activeChatId}>
         <Sparkles size={16} /> Summarize Chat
       </button>

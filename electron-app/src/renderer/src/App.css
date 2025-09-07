@@ -151,9 +151,21 @@
   color: var(--text-primary);
 }
 
+.chat-header-info {
+  display: flex;
+  align-items: center;
+}
+
 .chat-header h3 {
   margin: 0;
   color: var(--text-primary); /* Ensure contact name is visible */
+}
+
+.chat-header-avatar {
+  width: 40px; /* Slightly smaller than chat list avatar */
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
 }
 
 .summarize-button {
