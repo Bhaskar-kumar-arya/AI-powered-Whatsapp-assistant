@@ -1,6 +1,13 @@
 import { app, BrowserWindow } from 'electron'
-import { Client, LocalAuth } from 'whatsapp-web.js'
+import { Client, LocalAuth, MessageMedia } from 'whatsapp-web.js'
 import qrcode from 'qrcode'
+import fs from 'fs'
+import path from 'path'
+
+const mediaDir = path.join(app.getPath('userData'), 'media')
+if (!fs.existsSync(mediaDir)) {
+  fs.mkdirSync(mediaDir)
+}
 
 let client: Client | null = null
 let clientReadyPromise: Promise<void>
@@ -51,10 +58,10 @@ export function initializeWhatsappClient(mainWindow: BrowserWindow): void {
   })
   
   client.on('message', async (msg) => {
-    console.log('New message received:', msg.body);
+    console.log('New message received:', msg.body)
 
-    const chat = await msg.getChat();
-    console.log('From chat:', chat.name);
+    const chat = await msg.getChat()
+    console.log('From chat:', chat.name)
 
     const mappedMessage: Message = {
       id: msg.id._serialized,
@@ -62,10 +69,12 @@ export function initializeWhatsappClient(mainWindow: BrowserWindow): void {
       timestamp: msg.timestamp,
       fromMe: msg.fromMe,
       hasMedia: msg.hasMedia,
-      hasQuotedMsg: msg.hasQuotedMsg
-    };
-    mainWindow.webContents.send('new-message', chat.id._serialized, mappedMessage);
-  });
+      hasQuotedMsg: msg.hasQuotedMsg,
+      mediaUrl: undefined,
+      mediaMimeType: msg.hasMedia ? msg.type : undefined
+    }
+    mainWindow.webContents.send('new-message', chat.id._serialized, mappedMessage)
+  })
 
   client.initialize();
 }
@@ -100,13 +109,15 @@ export async function getChatsForUI(): Promise<Chat[]> {
       const contact = await chat.getContact()
       const profilePicUrl = await contact.getProfilePicUrl()
 
-      const mappedMessages: Message[] = messages.map(msg => ({
+      const mappedMessages: Message[] = messages.map((msg) => ({
         id: msg.id._serialized,
         body: msg.body,
         timestamp: msg.timestamp,
         fromMe: msg.fromMe,
         hasMedia: msg.hasMedia,
-        hasQuotedMsg: msg.hasQuotedMsg
+        hasQuotedMsg: msg.hasQuotedMsg,
+        mediaUrl: undefined,
+        mediaMimeType: undefined
       }))
 
       const lastMessage = chat.lastMessage ? {
@@ -132,9 +143,32 @@ export async function getChatsForUI(): Promise<Chat[]> {
         messages: mappedMessages, // Add messages array
         contactName: chat.isGroup ? chat.name : (contact.name || contact.pushname || chat.id._serialized)
       }
+      
     })
   )
   return chatsWithMetadata
+}
+
+export async function downloadMedia(messageId: string): Promise<{ mediaUrl: string; mediaMimeType: string } | undefined> {
+  await clientReadyPromise
+  if (!client) {
+    throw new Error('Whatsapp client not initialized.')
+  }
+  try {
+    const message = await client.getMessageById(messageId)
+    if (message && message.hasMedia) {
+      const media = await message.downloadMedia()
+      if (media) {
+        const mediaPath = path.join(mediaDir, `${message.id.id}`)
+        const buffer = Buffer.from(media.data, 'base64')
+        fs.writeFileSync(mediaPath, buffer)
+        return { mediaUrl: `whatsapp-media://${message.id.id}`, mediaMimeType: media.mimetype }
+      }
+    }
+  } catch (error) {
+    console.error(`Error downloading media for message ${messageId}:`, error)
+  }
+  return undefined
 }
 
 export async function getChatPictureUrl(chatId: string): Promise<string | undefined> {

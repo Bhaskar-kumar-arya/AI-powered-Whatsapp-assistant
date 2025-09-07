@@ -10,6 +10,7 @@ declare global {
         getChatsForUI: () => Promise<Chat[]>
         sendMessage: (chatId: string, message: string) => Promise<void>
         onNewMessage: (callback: (chatId: string, message: Message) => void) => () => void
+        downloadMedia: (messageId: string) => Promise<{ mediaUrl: string; mediaMimeType: string } | undefined>
       }
     }
   }
@@ -22,6 +23,8 @@ declare global {
     hasMedia: boolean;
     hasQuotedMsg: boolean;
     status?: 'pending' | 'sent' | 'delivered' | 'read' | 'failed';
+    mediaUrl?: string;
+    mediaMimeType?: string; // Make mediaMimeType optional
   }
 
   export interface Chat {

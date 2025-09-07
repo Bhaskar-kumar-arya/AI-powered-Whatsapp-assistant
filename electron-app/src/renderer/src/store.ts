@@ -4,6 +4,8 @@ import { Chat as PreloadChat, Message as PreloadMessage } from '../../preload/in
 // Define types for your data, extending the preload types with UI-specific properties
 export interface Message extends PreloadMessage {
   status?: 'pending' | 'sent' | 'delivered' | 'read' | 'failed'; // Crucial for ticks, now optional and includes pending/failed
+  mediaUrl?: string;
+  mediaMimeType?: string;
 }
 
 export interface Chat extends PreloadChat {

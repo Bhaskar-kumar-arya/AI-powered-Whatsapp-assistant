@@ -11,6 +11,7 @@ const api = {
     getChatPictureUrl: (chatId: string) => ipcRenderer.invoke('whatsapp-get-chat-picture-url', chatId),
     getChatsForUI: () => ipcRenderer.invoke('whatsapp-get-chats-for-ui'),
     sendMessage: (chatId: string, message: string) => ipcRenderer.invoke('whatsapp-send-message', chatId, message),
+    downloadMedia: (messageId: string) => ipcRenderer.invoke('whatsapp-download-media', messageId),
     onNewMessage: (callback: (chatId: string, message: Message) => void) => {
       const handler = (_event, chatId, message) => callback(chatId, message);
       ipcRenderer.on('new-message', handler);

@@ -42,6 +42,10 @@ export const fetchMoreChatAvatars = async (chatIds: string[]): Promise<{ [chatId
   return avatars;
 };
 
+export const downloadMedia = async (messageId: string): Promise<{ mediaUrl: string; mediaMimeType: string } | undefined> => {
+  return await window.api.whatsapp.downloadMedia(messageId);
+};
+
 /**
  * Mocks fetching messages for a specific chat.
  */

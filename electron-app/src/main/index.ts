@@ -1,8 +1,11 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, protocol } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { initializeWhatsappClient, getChatPictureUrl, getChatsForUI, sendMessage } from './whatsappClient'
+import { initializeWhatsappClient, getChatPictureUrl, getChatsForUI, sendMessage, downloadMedia } from './whatsappClient'
+import fs from 'fs'
+import path from 'path'
+import mime from 'mime'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -44,6 +47,19 @@ function createWindow(): void {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  // Register a custom protocol to serve media files
+  protocol.handle('whatsapp-media', async (request) => {
+    const mediaPath = path.join(app.getPath('userData'), 'media', request.url.replace('whatsapp-media://', ''))
+    try {
+      const data = await fs.promises.readFile(mediaPath)
+      const mimeType = mime.getType(mediaPath) || 'application/octet-stream'
+      return new Response(new Blob([new Uint8Array(data)], { type: mimeType }))
+    } catch (error) {
+      console.error('Failed to serve media file:', error)
+      return new Response('File not found', { status: 404 })
+    }
+  })
+
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
@@ -96,6 +112,17 @@ app.whenReady().then(() => {
       await sendMessage(chatId, message)
     } catch (error) {
       console.error(`Error sending message to ${chatId}:`, error)
+    }
+  })
+
+  // Handle IPC call to download media
+  ipcMain.handle('whatsapp-download-media', async (_event, messageId: string) => {
+    try {
+      const mediaUrl = await downloadMedia(messageId)
+      return mediaUrl
+    } catch (error) {
+      console.error(`Error downloading media for message ${messageId}:`, error)
+      return undefined
     }
   })
 })
