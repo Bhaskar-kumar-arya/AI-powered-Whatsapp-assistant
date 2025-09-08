@@ -58,7 +58,7 @@ const Pane3_AIPanel: React.FC = () => {
           )
           .join('\n') || '';
  
-      const systemInstruction = `You are integrated into WhatsApp. Here are the active chat messages:\n${chatHistoryInstruction}`;
+      const systemInstruction = `You are integrated into WhatsApp.you are supposed to help the user of the account for this whatsapp instance. Here are the active chat messages:\n${chatHistoryInstruction}`;
  
       const chat = ai.chats.create({
         model: "gemini-2.5-flash",

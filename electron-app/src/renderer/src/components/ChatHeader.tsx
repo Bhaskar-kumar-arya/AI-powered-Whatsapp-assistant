@@ -26,9 +26,6 @@ const ChatHeader: React.FC = () => {
         )}
         <h3>{activeChat?.contactName || activeChat?.name || 'Select a Chat'}</h3>
       </div>
-      <button className="summarize-button" onClick={handleSummarizeChat} disabled={!activeChatId}>
-        <Sparkles size={16} /> Summarize Chat
-      </button>
     </div>
   );
 };

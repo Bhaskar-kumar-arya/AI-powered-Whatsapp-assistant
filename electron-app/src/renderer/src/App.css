@@ -3,9 +3,59 @@
 
 .main-layout {
   display: grid;
-  grid-template-columns: 320px 1fr 400px; /* Adjust widths as needed, increased first pane width and third pane width */
+  grid-template-columns: 320px 1fr 600px; /* Adjust widths as needed, increased first pane width and third pane width */
   height: 100vh;
   width: 100vw;
+  transition: grid-template-columns 0.3s ease-in-out; /* Smooth transition for column changes */
+}
+
+.main-layout.pane3-collapsed {
+  grid-template-columns: 320px 1fr 40px; /* Pane 3 collapses to 40px for the button */
+}
+
+.pane3-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border-color);
+  background-color: var(--pane-2-bg);
+  color: var(--text-primary);
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out; /* Transition for width and opacity */
+}
+
+.pane3-container.collapsed {
+  /* The width will now be controlled by the grid-template-columns */
+}
+
+.pane3-container.collapsed .pane3-ai-panel {
+  opacity: 0;
+  pointer-events: none; /* Disable interactions when collapsed */
+}
+
+.pane3-ai-panel {
+  flex-grow: 1; /* Allow it to take available space */
+  transition: opacity 0.3s ease-in-out;
+}
+
+.collapse-button {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: var(--search-bar-bg); /* Changed to grayish color */
+  color: var(--text-primary); /* Changed to primary text color */
+  border: none;
+  padding: 5px;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+  z-index: 10; /* Ensure button is above other content */
+}
+
+.collapse-button:hover {
+  opacity: 0.9;
 }
 
 .pane1-chatlist {
