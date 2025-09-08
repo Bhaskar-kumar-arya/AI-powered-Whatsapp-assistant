@@ -7,7 +7,7 @@
   --app-bg: #EAE6DF; /* Main app background (behind panes) */
   --pane-1-bg: #FFFFFF; /* Chat list background */
   --pane-2-bg: #ECE5DD; /* Chat conversation background */
-  --chat-bg-pattern: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); /* Classic WhatsApp doodle pattern */
+  --chat-bg-pattern: url('../../../resources/wbg.png'); /* Classic WhatsApp doodle pattern */
   
   /* Bubbles */
   --outgoing-bubble-bg: #D9FDD3;
@@ -31,29 +31,33 @@
 
 [data-theme='dark'] {
   /* Brand Colors */
-  --brand-green: #00A884;
-  --brand-green-light: #25D366;
+  --brand-green: #075E54; /* WhatsApp Teal Green Dark */
+  --brand-green-light: #25D366; /* WhatsApp Light Green */
   
   /* Backgrounds */
-  --app-bg: #0b141a;
-  --pane-1-bg: #111B21;
-  --pane-2-bg: #0b141a;
-  --chat-bg-pattern: url('https://raw.githubusercontent.com/Telegram-FOSS-Team/Telegram-FOSS/master/TMessagesProj/src/main/res/drawable-nodpi/bg_doodle_dark.png'); /* A dark doodle pattern */
+  --app-bg: #0B141A; /* Dark background */
+  --pane-1-bg: #353434; /* Darker pane background */
+  --pane-2-bg: #292929; /* Chat conversation background */
+  --chat-bg-pattern: url('../../../resources/wbg.png'); /* Transparent dark WhatsApp background pattern */
 
   /* Bubbles */
-  --outgoing-bubble-bg: #005C4B;
-  --incoming-bubble-bg: #202C33;
+  --outgoing-bubble-bg: #005C4B; /* Dark outgoing bubble */
+  --incoming-bubble-bg: #353434; /* Dark incoming bubble */
   
   /* Text */
-  --text-primary: #E9EDEF;
-  --text-secondary: #8696A0;
-  --text-link: #53BDEB;
+  --text-primary: #E9EDEF; /* Light text for dark background */
+  --text-secondary: #afb5b8; /* Slightly darker text for secondary info */
+  --text-link: #53BDEB; /* Link color */
   
   /* UI Elements */
-  --active-chat-bg: #202C33;
-  --icon-color: #AEBAC1;
-  --border-color: #222e35;
-  --search-bar-bg: #202C33;
+  --active-chat-bg: #202C33; /* Active chat background */
+  --icon-color: #AEBAC1; /* Icon color */
+  --border-color: #222E35; /* Border color */
+  --search-bar-bg: #202C33; /* Search bar background */
+
+  /* AI Accent (From your design doc) */
+  --ai-accent: #007BFF; /* Keeping original AI accent for now */
+  --ai-accent-subtle-bg: rgba(0, 123, 255, 0.1); /* Keeping original AI accent subtle background for now */
 }
 
 a {
@@ -73,10 +77,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-#pane-2-conversation-area {
-  background-color: var(--pane-2-bg);
-  background-image: var(--chat-bg-pattern);
-}
 
 h1 {
   font-size: 3.2em;
@@ -102,3 +102,39 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--app-bg); /* Use app background for the track */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: transparent; /* Make thumb transparent by default */
+  border-radius: 10px;
+  border: 2px solid transparent; /* Transparent border */
+}
+
+/* Show scrollbar thumb on hover of the scrollable area */
+.pane1-chatlist:hover::-webkit-scrollbar-thumb,
+.message-list:hover::-webkit-scrollbar-thumb,
+.tabs-content:hover::-webkit-scrollbar-thumb,
+.message-list-area:hover::-webkit-scrollbar-thumb {
+  background-color: var(--brand-green); /* WhatsApp green for the thumb on hover */
+  border-color: var(--app-bg); /* Border to match track color on hover */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--brand-green-light); /* Lighter green on hover */
+}
+
+/* Firefox scrollbar styles */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--brand-green) var(--app-bg);
+}

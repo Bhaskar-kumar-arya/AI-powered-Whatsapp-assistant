@@ -68,8 +68,8 @@ function App() {
 
   if (!isWhatsappReady && qrCode) {
     return (
-      <div className="qr-code-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
-        <h1>Scan this QR code with your WhatsApp app</h1>
+      <div className="qr-code-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column', backgroundColor: 'var(--app-bg)', color: 'var(--text-primary)' }}>
+        <h1 style={{ color: 'var(--text-primary)' }}>Scan this QR code with your WhatsApp app</h1>
         <img src={qrCode} alt="WhatsApp QR Code" style={{ width: '300px', height: '300px' }} />
       </div>
     )
@@ -77,8 +77,8 @@ function App() {
 
   if (!isWhatsappReady && !qrCode) {
     return (
-      <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <h1>Initializing WhatsApp...</h1>
+      <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'var(--app-bg)', color: 'var(--text-primary)' }}>
+        <h1 style={{ color: 'var(--text-primary)' }}>Initializing WhatsApp...</h1>
       </div>
     )
   }
