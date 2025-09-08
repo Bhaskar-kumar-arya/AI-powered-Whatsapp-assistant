@@ -26,6 +26,8 @@ declare global {
     status?: 'pending' | 'sent' | 'delivered' | 'read' | 'failed';
     mediaUrl?: string;
     mediaMimeType?: string; // Make mediaMimeType optional
+    senderName?: string;
+    senderPic?: string;
   }
 
   export interface Chat {

@@ -78,7 +78,18 @@ export function initializeWhatsappClient(mainWindow: BrowserWindow): void {
       hasMedia: msg.hasMedia,
       hasQuotedMsg: msg.hasQuotedMsg,
       mediaUrl: undefined,
-      mediaMimeType: msg.hasMedia ? msg.type : undefined
+      mediaMimeType: msg.hasMedia ? msg.type : undefined,
+      senderName: undefined,
+      senderPic: undefined
+    }
+
+    if (chat.isGroup) {
+      const sender = await msg.getContact()
+      const profilePicUrl = await sender.getProfilePicUrl()
+      const name = sender.name || sender.pushname || sender.number
+      console.log("message from group by", name, "profile", profilePicUrl)
+      mappedMessage.senderName = name
+      mappedMessage.senderPic = profilePicUrl
     }
     mainWindow.webContents.send('new-message', chat.id._serialized, mappedMessage)
   })
@@ -99,6 +110,7 @@ export function getWhatsappClient(): Client | null {
 }
 
 import { Message, Chat } from '../preload/index.d'
+import { log } from 'console'
 
 export async function getChatsForUI(): Promise<Chat[]> {
   await clientReadyPromise // Wait for the client to be ready
@@ -114,18 +126,35 @@ export async function getChatsForUI(): Promise<Chat[]> {
     top25Chats.map(async (chat) => {
       const messages = await chat.fetchMessages({ limit: 20 }) // Fetch messages for each chat
       const contact = await chat.getContact()
-      const profilePicUrl = await contact.getProfilePicUrl()
+      const profilePicUrl = client ? await client.getProfilePicUrl(chat.id._serialized) : undefined
+      const mappedMessages: Message[] = await Promise.all(messages.map(async (msg) => {
+        let senderName: string | undefined
+        let senderPic: string | undefined
 
-      const mappedMessages: Message[] = messages.map((msg) => ({
-        id: msg.id._serialized,
-        chatId: chat.id._serialized, // Add chatId
-        body: msg.body,
-        timestamp: msg.timestamp,
-        fromMe: msg.fromMe,
-        hasMedia: msg.hasMedia,
-        hasQuotedMsg: msg.hasQuotedMsg,
-        mediaUrl: undefined,
-        mediaMimeType: msg.hasMedia ? msg.type : undefined
+        if (chat.isGroup) {
+          const sender = await msg.getContact()
+          try {
+            senderPic = await sender.getProfilePicUrl()
+          } catch (error) {
+            console.error(`Error fetching sender profile picture for message ${msg.id._serialized}:`, error)
+            senderPic = undefined // Set to undefined if fetching fails
+          }
+          senderName = sender.name || sender.pushname || sender.number
+        }
+
+        return {
+          id: msg.id._serialized,
+          chatId: chat.id._serialized, // Add chatId
+          body: msg.body,
+          timestamp: msg.timestamp,
+          fromMe: msg.fromMe,
+          hasMedia: msg.hasMedia,
+          hasQuotedMsg: msg.hasQuotedMsg,
+          mediaUrl: undefined,
+          mediaMimeType: msg.hasMedia ? msg.type : undefined,
+          senderName: senderName,
+          senderPic: senderPic
+        }
       }))
 
       const lastMessage = chat.lastMessage ? {
@@ -137,6 +166,8 @@ export async function getChatsForUI(): Promise<Chat[]> {
         hasMedia: chat.lastMessage.hasMedia,
         hasQuotedMsg: chat.lastMessage.hasQuotedMsg
       } : null
+      
+      const contactName = chat.isGroup ? chat.name : (contact.name || contact.pushname || chat.id._serialized)
 
       return {
         id: chat.id._serialized,
@@ -150,9 +181,8 @@ export async function getChatsForUI(): Promise<Chat[]> {
         pinned: chat.pinned,
         archived: chat.archived,
         messages: mappedMessages, // Add messages array
-        contactName: chat.isGroup ? chat.name : (contact.name || contact.pushname || chat.id._serialized)
-      }
-      
+        contactName: contactName
+      }      
     })
   )
   return chatsWithMetadata

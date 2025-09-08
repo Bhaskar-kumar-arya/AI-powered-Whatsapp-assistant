@@ -7,7 +7,7 @@ interface MessageBubbleProps {
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
-  const { body, fromMe, timestamp, status, hasMedia, mediaMimeType, id } = message;
+  const { body, fromMe, timestamp, status, hasMedia, mediaMimeType, id, senderName, senderPic } = message;
   const senderClass = fromMe ? 'me' : 'other';
   const [showAiIcon, setShowAiIcon] = useState(false);
   const updateMessageMediaBlobUrl = useStore((state) => state.updateMessageMediaBlobUrl); // Get the action from the store
@@ -99,6 +99,12 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
       onMouseEnter={() => setShowAiIcon(true)}
       onMouseLeave={() => setShowAiIcon(false)}
     >
+      {!fromMe && senderName && (
+        <div className="message-sender-info">
+          {senderPic && <img src={senderPic} alt={senderName} className="message-sender-avatar" />}
+          <span className="message-sender-name">{senderName}</span>
+        </div>
+      )}
       {renderMediaContent()}
       <div className="message-metadata">
         <span className="message-timestamp">{new Date(timestamp * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>

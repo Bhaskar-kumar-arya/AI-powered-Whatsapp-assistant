@@ -196,7 +196,7 @@
 .message-bubble {
   display: flex;
   flex-direction: column;
-  max-width: 70%;
+  max-width: 50%;
   margin-bottom: 10px;
   padding: 5px 5px;
   border-radius: 8px; /* Rounded corners */
@@ -498,6 +498,50 @@
 
 .ai-context-menu button {
   background: none;
+}
+
+/* Styles for sender info in group messages */
+.message-sender-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  gap: 8px; /* Space between avatar and name */
+}
+
+.message-sender-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.message-sender-name {
+  font-weight: bold;
+  color: var(--text-primary); /* Or a distinct color for sender names */
+  font-size: 0.85em;
+}
+
+
+/* Styles for sender info in group messages */
+.message-sender-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  gap: 8px; /* Space between avatar and name */
+}
+
+.message-sender-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.message-sender-name {
+  font-weight: bold;
+  color: var(--text-primary); /* Or a distinct color for sender names */
+  font-size: 0.85em;
+
   border: none;
   color: var(--text-primary);
   padding: 8px 10px;
