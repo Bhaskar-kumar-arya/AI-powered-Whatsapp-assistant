@@ -1,17 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenAI } from "@google/genai";
-
+import ReactMarkdown from 'react-markdown';
+import useStore from '../store';
+import { Chat } from '../store';
+ 
 // Initialize GoogleGenAI with your API key
 // It's recommended to load the API key from a secure environment variable
 // or a configuration file, not hardcode it directly.
 const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GOOGLE_API_KEY }); // Placeholder for API key
-
+ 
 interface Message {
   role: "user" | "model";
   text: string;
 }
-
+ 
 const Pane3_AIPanel: React.FC = () => {
+  const { chats, activeChatId } = useStore();
+  const activeChat = chats.find((chat: Chat) => chat.id === activeChatId);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -41,16 +46,31 @@ const Pane3_AIPanel: React.FC = () => {
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     setInput("");
     setLoading(true);
-
+ 
     try {
+      const chatHistoryInstruction =
+        activeChat?.messages
+          ?.map(
+            (msg) =>
+              `${new Date(msg.timestamp * 1000).toLocaleString()} - ${
+                msg.fromMe ? 'You' : activeChat.name
+              }: ${msg.body}`
+          )
+          .join('\n') || '';
+ 
+      const systemInstruction = `You are integrated into WhatsApp. Here are the active chat messages:\n${chatHistoryInstruction}`;
+ 
       const chat = ai.chats.create({
         model: "gemini-2.5-flash",
-        history: messages.map(msg => ({
+        history: messages.map((msg) => ({
           role: msg.role,
           parts: [{ text: msg.text }],
         })),
+        config: {
+          systemInstruction: systemInstruction,
+        },
       });
-
+ 
       const stream = await chat.sendMessageStream({
         message: userMessage.text,
       });
@@ -106,7 +126,8 @@ const Pane3_AIPanel: React.FC = () => {
               msg.role === "user" ? "user-message" : "ai-message"
             }`}
           >
-            <strong>{msg.role === "user" ? "You" : "AI"}:</strong> {msg.text}
+            <strong>{msg.role === "user" ? "You" : "AI"}:</strong>
+            {msg.role === 'model' ? <ReactMarkdown>{msg.text}</ReactMarkdown> : msg.text}
           </div>
         ))}
         {loading && (
