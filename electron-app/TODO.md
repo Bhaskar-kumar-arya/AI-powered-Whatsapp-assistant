@@ -1,0 +1,3 @@
+1. add different message bubbles for images,videos,voice notes , pdfs etc.....
+2. handle message_create event 
+3. display group chat messages with sender options

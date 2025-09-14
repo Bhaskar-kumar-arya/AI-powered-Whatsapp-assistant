@@ -1,0 +1,667 @@
+
+
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr 600px; /* Adjust widths as needed, increased first pane width and third pane width */
+  height: 100vh;
+  width: 100vw;
+  transition: grid-template-columns 0.3s ease-in-out; /* Smooth transition for column changes */
+}
+
+.main-layout.pane3-collapsed {
+  grid-template-columns: 400px 1fr 40px; /* Pane 3 collapses to 40px for the button */
+}
+
+.pane3-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border-color);
+  background-color: var(--pane-2-bg);
+  color: var(--text-primary);
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out; /* Transition for width and opacity */
+}
+
+.pane3-container.collapsed {
+  /* The width will now be controlled by the grid-template-columns */
+}
+
+.pane3-container.collapsed .pane3-ai-panel {
+  opacity: 0;
+  pointer-events: none; /* Disable interactions when collapsed */
+}
+
+.pane3-ai-panel {
+  flex-grow: 1; /* Allow it to take available space */
+  transition: opacity 0.3s ease-in-out;
+}
+
+.collapse-button {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: var(--search-bar-bg); /* Changed to grayish color */
+  color: var(--text-primary); /* Changed to primary text color */
+  border: none;
+  padding: 5px;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+  z-index: 10; /* Ensure button is above other content */
+}
+
+.collapse-button:hover {
+  opacity: 0.9;
+}
+
+.pane1-chatlist {
+  border-right: 1px solid var(--border-color);
+  padding: 10px;
+  overflow-y: auto;
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+  display: flex;
+  flex-direction: column;
+  background-color: var(--pane-1-bg);
+  color: var(--text-primary);
+}
+
+.chat-list-header {
+  margin-bottom: 10px;
+}
+
+.global-search-bar {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  margin-bottom: 10px;
+  background-color: #383737; /* Lighter grey background */
+  color: var(--text-primary);
+  border: 1px solid #CCCCCC; /* Lighter grey border */
+}
+
+.filter-buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+.filter-button {
+  background-color: #383737; /* Lighter grey background */
+  color: var(--text-secondary); /* Secondary text for subtle look */
+  border: 1px solid #525252; /* Lighter grey border */
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.filter-button:hover {
+  background-color: var(--active-chat-bg); /* Active chat bg on hover */
+}
+
+.global-search-bar:focus,
+.filter-button:focus {
+  outline: none; /* Remove focus outline */
+}
+
+.chat-list-container {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.chat-list-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: none; /* Remove individual item borders */
+  cursor: pointer;
+  background-color: var(--pane-1-bg); /* Ensure consistent background */
+}
+
+.chat-list-item:hover {
+  background-color: var(--active-chat-bg);
+}
+
+.chat-list-item.active {
+  background-color: var(--active-chat-bg); /* Active chat background */
+}
+
+.chat-list-item:focus,
+.chat-list-item:focus-visible {
+  outline: none; /* Remove focus outline */
+}
+
+.chat-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.chat-info {
+  flex-grow: 1;
+  min-width: 0; /* Allow content to shrink and ellipsis to work */
+}
+
+.chat-name {
+  font-weight: bold;
+}
+
+.chat-last-message {
+  color: var(--text-secondary);
+  font-size: 0.9em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.chat-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.chat-timestamp {
+  font-size: 0.8em;
+  color: var(--text-secondary);
+}
+
+.chat-unread-count {
+  background-color: var(--brand-green-light);
+  color: white;
+  border-radius: 50%;
+  padding: 2px; /* Adjust padding for a more compact look */
+  font-size: 0.7em;
+  margin-top: 5px;
+  min-width: 20px; /* Ensure it's a circle */
+  height: 20px; /* Ensure it's a circle */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.ai-indicator {
+  margin-left: 5px;
+  font-size: 1.2em;
+  color: var(--ai-accent); /* AI accent color from UIplan.md */
+}
+
+.pane2-conversation {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-right: 1px solid var(--border-color);
+  background-color: var(--pane-2-bg); /* Apply chat conversation background */
+  overflow: hidden; /* Ensure content within this pane is clipped */
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--pane-1-bg); /* Use pane-1-bg for header */
+  color: var(--text-primary);
+}
+
+.chat-header-info {
+  display: flex;
+  align-items: center;
+}
+
+.chat-header h3 {
+  margin: 0;
+  color: var(--text-primary); /* Ensure contact name is visible */
+}
+
+.chat-header-avatar {
+  width: 40px; /* Slightly smaller than chat list avatar */
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.summarize-button {
+  background-color: var(--ai-accent); /* AI accent color */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.summarize-button:hover {
+  background-color: var(--ai-accent); /* Keep AI accent on hover for consistency */
+  opacity: 0.9;
+}
+
+.message-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 20px 75px; /* Increased padding for left and right gaps */
+  display: flex;
+  flex-direction: column;
+background-image: linear-gradient(rgba(46, 46, 46, 0.9), rgba(44, 44, 44, 0.9)), var(--chat-bg-pattern);  background-color: var(--pane-2-bg); /* Fallback background color */
+  min-height: 0; /* Allow the flex item to shrink */
+}
+
+.message-bubble {
+  display: flex;
+  flex-direction: column;
+  max-width: 50%;
+  margin-bottom: 10px;
+  padding: 5px 5px;
+  border-radius: 8px; /* Rounded corners */
+  position: relative;
+  box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13); /* Subtle box-shadow for depth */
+}
+
+.message-bubble.me {
+  align-self: flex-end;
+  background-color: var(--outgoing-bubble-bg);
+}
+
+.message-bubble.other {
+  align-self: flex-start;
+  background-color: var(--incoming-bubble-bg);
+  border: 1px solid var(--border-color);
+}
+
+.message-text {
+  margin: 0;
+  word-wrap: break-word;
+  color: var(--text-primary); /* Ensure text is visible */
+}
+
+/* Media message styling */
+.message-media-image,
+.message-media-video {
+  max-width: 100%;
+  width: 325px;
+  height: 325px;
+  object-fit :cover;
+  border-radius: 8px;
+  margin-top: 5px;
+}
+
+.media-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px; /* Give some height to the placeholder */
+  background-color: var(--search-bar-bg); /* A subtle background */
+  border-radius: 8px;
+  padding: 10px;
+  color: var(--text-secondary);
+}
+
+.media-placeholder p {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.media-placeholder button {
+  background-color: var(--brand-green-light);
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.media-placeholder button:hover {
+  opacity: 0.9;
+}
+
+.message-metadata {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Space between timestamp and status ticks */
+  margin-top: 5px;
+  align-self: flex-end;
+}
+
+.message-timestamp {
+  font-size: 0.7em;
+  color: var(--text-secondary);
+}
+
+.message-status-ticks {
+  font-size: 0.7em;
+  color: var(--text-secondary);
+}
+
+.message-status-ticks.read {
+  color: var(--text-link);
+}
+
+.ai-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2em;
+  cursor: pointer;
+  color: var(--ai-accent); /* AI accent color */
+  background-color: var(--incoming-bubble-bg); /* Use incoming bubble bg for contrast */
+  border-radius: 50%;
+  padding: 2px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.message-bubble.me .ai-icon {
+  left: -25px; /* Position to the left of 'me' bubbles */
+}
+
+.message-bubble.other .ai-icon {
+  right: -25px; /* Position to the right of 'other' bubbles */
+}
+
+.message-input-box {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--search-bar-bg); /* Use search bar bg for input area */
+}
+
+.message-input-box input {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  margin-right: 10px;
+  background-color: var(--pane-1-bg); /* White background for input field */
+  color: var(--text-primary);
+}
+
+.message-input-box button {
+  background-color: var(--brand-green-light); /* WhatsApp green for send button */
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.message-input-box button.ai-button {
+  background-color: transparent;
+  color: var(--ai-accent);
+  font-size: 1.5em;
+  padding: 0 5px;
+  margin-right: 5px;
+}
+
+.message-input-box button:hover {
+  opacity: 0.9;
+}
+
+/* Pane 3 AI Panel */
+.pane3-ai-panel {
+  border-left: 1px solid var(--border-color);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--pane-2-bg); /* Consistent background with Pane 2 */
+  color: var(--text-primary);
+  height: 100%; /* Ensure the panel takes full height */
+  box-sizing: border-box; /* Include padding in the element's total height */
+  overflow: hidden; /* Prevent content from overflowing the panel itself */
+}
+
+.ai-panel-header-container {
+  position: relative; /* Allow absolute positioning of children */
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid transparent; /* Placeholder for the gradient border */
+  border-image: linear-gradient(to right, transparent, var(--ai-accent) 20%, var(--ai-accent) 80%, transparent) 1;
+  text-align: center; /* Center the text within the container */
+}
+
+.ai-panel-header {
+  margin: 0; /* Remove default margin */
+  font-size: 1.5em;
+  color: var(--text-primary);
+  display: inline-block; /* Allow text-align to center it */
+}
+
+.clear-chat-button {
+  position: absolute; /* Position independently */
+  right: 0; /* Align to the right edge */
+  top: 50%; /* Vertically center */
+  transform: translateY(-50%); /* Adjust for vertical centering */
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.clear-chat-button:hover {
+  background-color: var(--search-bar-bg);
+  color: var(--ai-accent);
+}
+
+.ai-message-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: var(--pane-1-bg); /* Use pane 1 bg for message list */
+  border-radius: 8px;
+  margin-bottom: 10px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Inner shadow for depth */
+}
+
+.ai-message-bubble {
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  border-radius: 18px; /* More rounded corners for bubbles */
+  max-width: 85%; /* Slightly wider bubbles */
+  word-wrap: break-word;
+  line-height: 1.4;
+  color: var(--text-primary);
+  box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.08); /* Subtle shadow for bubbles */
+}
+
+.ai-message-bubble strong {
+  font-weight: 600; /* Slightly bolder role name */
+}
+
+.user-message {
+  background-color: var(--outgoing-bubble-bg);
+  margin-left: auto;
+  border-bottom-right-radius: 4px; /* Pointed corner for user message */
+}
+
+.ai-message {
+  background-color: var(--incoming-bubble-bg);
+  margin-right: auto;
+  border: 1px solid var(--border-color);
+  border-bottom-left-radius: 4px; /* Pointed corner for AI message */
+}
+
+.ai-input-area {
+  display: flex;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+  background-color: var(--pane-2-bg); /* Consistent with chat input area */
+  border-radius: 8px;
+}
+
+.ai-message-input {
+  flex-grow: 1;
+  padding: 10px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 22px; /* More rounded input field */
+  margin-right: 10px;
+  background-color: var(--pane-1-bg);
+  color: var(--text-primary);
+  font-size: 1em;
+  transition: all 0.2s ease-in-out;
+}
+
+.ai-message-input:focus {
+  outline: none;
+  border-color: var(--ai-accent);
+  box-shadow: 0 0 0 2px var(--ai-accent-subtle-bg);
+}
+
+.ai-send-button {
+  background-color: var(--ai-accent);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 22px; /* More rounded send button */
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
+}
+
+.ai-send-button:hover {
+  background-color: var(--brand-green-light); /* Lighter green on hover */
+}
+
+.ai-send-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* CoPilotView (if still used, ensure it doesn't conflict) */
+.co-pilot-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* SummaryView, TasksView, DraftsView, FunctionsView */
+.summary-view,
+.tasks-view,
+.drafts-view,
+.functions-view {
+  padding: 10px;
+}
+
+.summary-view h3,
+.tasks-view h3,
+.drafts-view h3,
+.functions-view h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: var(--text-primary);
+}
+
+.summary-view ul,
+.tasks-view ul,
+.drafts-view ul,
+.functions-view ul {
+  list-style: none;
+  padding: 0;
+}
+
+.summary-view li,
+.tasks-view li,
+.drafts-view li,
+.functions-view li {
+  background-color: var(--search-bar-bg); /* Use search bar bg for list items */
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text-primary); /* Ensure text is clearly visible */
+}
+
+/* AI Context Menu */
+.ai-context-menu {
+  background-color: var(--ai-accent-subtle-bg);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  z-index: 10;
+}
+
+.ai-context-menu button {
+  background: none;
+}
+
+/* Styles for sender info in group messages */
+.message-sender-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  gap: 8px; /* Space between avatar and name */
+}
+
+.message-sender-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.message-sender-name {
+  font-weight: bold;
+  color: var(--text-primary); /* Or a distinct color for sender names */
+  font-size: 0.85em;
+}
+
+
+/* Styles for sender info in group messages */
+.message-sender-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  gap: 8px; /* Space between avatar and name */
+}
+
+.message-sender-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.message-sender-name {
+  font-weight: bold;
+  color: var(--text-primary); /* Or a distinct color for sender names */
+  font-size: 0.85em;
+
+  border: none;
+  color: var(--text-primary);
+  padding: 8px 10px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ai-context-menu button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* AI-Generated Content in Pane 3 */
+.pane3-ai-panel .message-bubble.ai-generated {
+  border-left: 4px solid var(--ai-accent);
+  background-color: var(--incoming-bubble-bg); /* Use incoming bubble bg for AI messages */
+}
+
+.functions-view label {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.functions-view input[type="checkbox"] {
+  margin-right: 10px;
+  transform: scale(1.2);
+}
