@@ -10,6 +10,8 @@ This project is an Electron-based desktop application that emulates WhatsApp Web
 *   **AI Copilot Integration:** A dedicated panel powered by the Google Gemini API that can "see" messages in the currently active chat.
 *   **Function Calling for AI:** The AI Copilot can send messages to active chats by leveraging function calling capabilities.
 
+The added third panel : 
+
 ![AI Copilot in action - the third panel of this app ](copilot.png)
 
 *   **Real-time Message Handling:** Processes new messages and updates the UI in real-time.
